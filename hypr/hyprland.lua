@@ -2,8 +2,6 @@
 -- ~/.config/hypr (see install.sh). Each concern is its own module under
 -- modules/; order matters where later modules override earlier ones.
 
--- Load a module only when its file exists, so an optional drop-in that was
--- never created does not show up in Hyprland's config-error overlay.
 local function optional(mod)
     if package.searchpath == nil or package.searchpath(mod, package.path) then
         local ok, err = pcall(require, mod)
@@ -24,6 +22,15 @@ require("modules.resize")
 require("modules.special")
 require("modules.window_rules")
 require("modules.autostart")
+
+-- Settings from the shell window. After the modules so they win, before user.lua.
+local settings = require("modules.paths").settings
+local file = io.open(settings, "r")
+if file then
+    file:close()
+    local ok, err = pcall(dofile, settings)
+    if not ok then print("yonux: failed to load " .. settings .. ": " .. tostring(err)) end
+end
 
 -- Machine-local overrides (gitignored). Loads last, so it wins.
 optional("user")

@@ -77,7 +77,7 @@ Singleton {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 padding: 5
-                font.pixelSize: 12
+                font.pixelSize: Theme.font.body.small
                 text: Hyprland.activeToplevel?.title ?? `Workspace ${Hyprland.focusedWorkspace?.name ?? "?"}`
             }
         }

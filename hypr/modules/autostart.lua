@@ -11,7 +11,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
 
-    hl.exec_cmd("mako --default-timeout 5000")
+    hl.exec_cmd("mako --default-timeout 5000 --font 'Google Sans Flex 11'")
     -- hyprlock.conf sources this file; it only exists after the first matugen run
     hl.exec_cmd("mkdir -p ~/.cache/yonux && touch ~/.cache/yonux/hyprlock-colors.conf")
 

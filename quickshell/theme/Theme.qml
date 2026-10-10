@@ -8,10 +8,44 @@ QtObject {
 
     readonly property var palette: Matugen.colors
 
+    component FontRole: QtObject {
+        required property int large
+        required property int medium
+        required property int small
+        required property int weight
+    }
+
     component FontTokens: QtObject {
-        readonly property string family: "JetBrainsMono Nerd Font"
-        readonly property int titleSize: 15
-        readonly property int bodySize: 13
+        id: tokens
+
+        readonly property string family: ShellSettings.value("font.family")
+        readonly property string mono: ShellSettings.value("font.mono")
+        readonly property real scale: ShellSettings.value("font.scale")
+
+        function px(size: int): int {
+            return Math.round(size * scale);
+        }
+
+        readonly property FontRole title: FontRole {
+            large: tokens.px(40)
+            medium: tokens.px(20)
+            small: tokens.px(15)
+            weight: Font.Medium
+        }
+
+        readonly property FontRole body: FontRole {
+            large: tokens.px(15)
+            medium: tokens.px(13)
+            small: tokens.px(12)
+            weight: Font.Normal
+        }
+
+        readonly property FontRole label: FontRole {
+            large: tokens.px(14)
+            medium: tokens.px(12)
+            small: tokens.px(11)
+            weight: Font.Medium
+        }
     }
 
     readonly property FontTokens font: FontTokens {}
@@ -28,7 +62,7 @@ QtObject {
         readonly property color border: root.palette?.outline_variant?.dark?.color ?? "#313244"
         readonly property color controlNormalFill: root.palette?.surface_container?.dark?.color ?? "#313244"
         readonly property color controlHoverFill: root.palette?.surface_container_high?.dark?.color ?? "#45475a"
-        readonly property color controlPressedFill: root.palette?.primary_container?.dark?.color ?? "#585b70"
+        readonly property color controlPressedFill: root.palette?.surface_bright?.dark?.color ?? "#585b70"
         readonly property color controlDisabledFill: root.palette?.surface_container_lowest?.dark?.color ?? "#2a2b3d"
     }
 
@@ -44,16 +78,18 @@ QtObject {
     readonly property SpacingTokens spacing: SpacingTokens {}
 
     component RadiusTokens: QtObject {
-        readonly property int sm: 6
-        readonly property int md: 8
-        readonly property int lg: 10
-        readonly property int xl: 12
+        readonly property real scale: ShellSettings.value("theme.radius")
+
+        readonly property int sm: Math.round(6 * scale)
+        readonly property int md: Math.round(8 * scale)
+        readonly property int lg: Math.round(10 * scale)
+        readonly property int xl: Math.round(12 * scale)
     }
 
     readonly property RadiusTokens radius: RadiusTokens {}
 
     component BarTokens: QtObject {
-        readonly property int height: 40
+        readonly property int height: ShellSettings.value("bar.height")
     }
 
     readonly property BarTokens bar: BarTokens {}

@@ -8,7 +8,7 @@ TrayItem {
     property date now: new Date()
 
     text: Qt.formatDateTime(now, "ddd, dd MMM  hh:mm:ss")
-    textSize: Theme.font.bodySize
+    textSize: Theme.font.body.medium
     hoverText: Qt.formatDate(now, "dddd, d MMMM yyyy")
 
     Timer {

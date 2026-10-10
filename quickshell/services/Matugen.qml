@@ -9,10 +9,12 @@ Singleton {
 
     readonly property string configPath: Quickshell.shellPath("matugen/config.toml")
     readonly property string wallpaperPath: Wallpaper.path
+    readonly property string scheme: ShellSettings.value("theme.scheme")
     property var colors: null
     property bool _dirty: false
 
     onWallpaperPathChanged: generate()
+    onSchemeChanged: generate()
     Component.onCompleted: generate()
 
     function generate(): void {
@@ -23,7 +25,7 @@ Singleton {
             return;
         }
 
-        matugenProc.command = ["matugen", "image", root.wallpaperPath, "-c", root.configPath, "-j", "hex", "--prefer", "darkness", "-m", "dark"];
+        matugenProc.command = ["matugen", "image", root.wallpaperPath, "-c", root.configPath, "-j", "hex", "--prefer", "darkness", "-m", "dark", "-t", root.scheme];
         matugenProc.running = true;
     }
 

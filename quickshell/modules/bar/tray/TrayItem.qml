@@ -12,7 +12,7 @@ Item {
 
     property alias icon: iconItem.icon
     property string text: ""
-    property int textSize: 12
+    property int textSize: Theme.font.label.medium
 
     property bool alert: false
 

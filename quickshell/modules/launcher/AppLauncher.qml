@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -31,7 +32,6 @@ Overlay {
                 })).filter(match => match.rank >= 0).sort((a, b) => a.rank - b.rank || a.app.name.localeCompare(b.app.name)).map(match => match.app);
     }
 
-    // Lower is better; -1 means no match
     function matchRank(app: DesktopEntry, query: string): int {
         if (query === "")
             return 0;
@@ -82,12 +82,19 @@ Overlay {
             id: searchField
             Layout.fillWidth: true
             Layout.preferredHeight: 48
+
             placeholderText: "Search apps..."
-            font.pixelSize: 16
-            color: Theme.colors.fg
             placeholderTextColor: Theme.colors.fgMuted
+
+            renderType: Text.QtRendering
+            font.family: Theme.font.family
+            font.hintingPreference: Font.PreferFullHinting
+            font.pixelSize: Theme.font.body.large
+
+            color: Theme.colors.fg
             leftPadding: 48
             rightPadding: 16
+
             background: Rectangle {
                 radius: Theme.radius.md
                 color: Theme.colors.field
@@ -174,11 +181,14 @@ Overlay {
                     }
 
                     UIText {
+                        renderType: Text.QtRendering
+                        font.pixelSize: Theme.font.label.large
+                        font.weight: Theme.font.label.weight
+
                         text: delegateRoot.modelData.name
-                        font.pixelSize: 14
-                        font.weight: Font.Normal
                         color: delegateRoot.selected || delegateRoot.hovered ? Theme.colors.active : Theme.colors.fg
                         elide: Text.ElideRight
+
                         verticalAlignment: Text.AlignVCenter
                         Layout.fillWidth: true
                     }

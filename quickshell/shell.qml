@@ -5,6 +5,7 @@ import qs.modules.bar
 import qs.modules.launcher
 import qs.modules.power
 import qs.modules.wallpaper
+import qs.modules.settings
 
 ShellRoot {
     WallpaperBackground {}
@@ -34,4 +35,6 @@ ShellRoot {
     AppLauncher {}
 
     PowerMenu {}
+
+    SettingsWindow {}
 }

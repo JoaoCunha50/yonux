@@ -174,6 +174,10 @@ Overlay {
                         UIText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: button.modelData.label
+
+                            renderType: Text.QtRendering
+                            renderTypeQuality: Text.HighRenderTypeQuality
+                            font.pixelSize: Theme.font.body.medium
                         }
                     }
 

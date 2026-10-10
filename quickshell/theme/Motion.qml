@@ -1,10 +1,20 @@
 pragma Singleton
 import QtQuick
+import qs.services
 
 QtObject {
-    readonly property int enter: 350
-    readonly property int exit: 200
-    readonly property int small: 200
+    id: root
+
+    readonly property real speed: HyprSettings.value("animations.enabled") ? HyprSettings.value("animations.speed") : 0
+
+    function scaled(ms: int): int {
+        return speed > 0 ? Math.round(ms / speed) : 0;
+    }
+
+    readonly property int enter: scaled(350)
+    readonly property int exit: scaled(200)
+    readonly property int small: scaled(200)
+    readonly property int extraSmall: scaled(100)
     readonly property int hoverDelay: 300
 
     readonly property real revealScale: 0.94

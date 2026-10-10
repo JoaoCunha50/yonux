@@ -1,4 +1,5 @@
 import QtQuick
+import qs.theme
 import qs.components
 
 TrayPopup {
@@ -13,6 +14,7 @@ TrayPopup {
     UIText {
         visible: root.text !== ""
         text: root.text
-        font.pixelSize: 12
+        font.pixelSize: Theme.font.label.medium
+        font.weight: Theme.font.label.weight
     }
 }

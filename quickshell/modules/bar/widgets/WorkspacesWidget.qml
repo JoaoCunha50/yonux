@@ -39,7 +39,8 @@ TrayItem {
                 UIText {
                     anchors.centerIn: parent
                     text: button.modelData.name
-                    font.pixelSize: 14
+                    font.pixelSize: Theme.font.label.large
+                    font.weight: Theme.font.label.weight
                     font.bold: button.active
                     color: button.active ? Theme.colors.active : Theme.colors.fg
                 }

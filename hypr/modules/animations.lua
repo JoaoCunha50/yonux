@@ -7,16 +7,28 @@ hl.curve("almostLinear", { type = "bezier", points = { { 0.5, 0.5 }, { 0.75, 1 }
 hl.curve("bloom", { type = "bezier", points = { { 0.16, 1.12 }, { 0.24, 1 } } })
 hl.curve("settle", { type = "bezier", points = { { 0.18, 0.86 }, { 0.24, 1 } } })
 
-hl.animation({ leaf = "global", enabled = true, speed = 10, bezier = "default" })
-hl.animation({ leaf = "border", enabled = true, speed = 5.39, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windows", enabled = true, speed = 4.5, bezier = "settle" })
-hl.animation({ leaf = "windowsIn", enabled = true, speed = 4, bezier = "bloom", style = "popin 87%" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 1.5, bezier = "linear", style = "popin 87%" })
-hl.animation({ leaf = "fadeIn", enabled = true, speed = 1.73, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeOut", enabled = true, speed = 1.46, bezier = "almostLinear" })
-hl.animation({ leaf = "fade", enabled = true, speed = 3.03, bezier = "quick" })
-hl.animation({ leaf = "layers", enabled = true, speed = 3.81, bezier = "easeOutQuint" })
-hl.animation({ leaf = "layersIn", enabled = true, speed = 4, bezier = "easeOutQuint", style = "fade" })
-hl.animation({ leaf = "layersOut", enabled = true, speed = 1.5, bezier = "linear", style = "fade" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 2.5, bezier = "settle", style = "slide" })
-hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 3, bezier = "settle", style = "slidevert" })
+yonux = yonux or {}
+
+-- The settings window sets yonux.animation_speed and calls this again; speed is a duration, so it divides.
+function yonux.apply_animations()
+    local scale = yonux.animation_speed or 1
+    local function animation(leaf, speed, bezier, style)
+        hl.animation({ leaf = leaf, enabled = true, speed = speed / scale, bezier = bezier, style = style })
+    end
+
+    animation("global", 10, "default")
+    animation("border", 5.39, "easeOutQuint")
+    animation("windows", 4.5, "settle")
+    animation("windowsIn", 4, "bloom", "popin 87%")
+    animation("windowsOut", 1.5, "linear", "popin 87%")
+    animation("fadeIn", 1.73, "almostLinear")
+    animation("fadeOut", 1.46, "almostLinear")
+    animation("fade", 3.03, "quick")
+    animation("layers", 3.81, "easeOutQuint")
+    animation("layersIn", 4, "easeOutQuint", "fade")
+    animation("layersOut", 1.5, "linear", "fade")
+    animation("workspaces", 2.5, "settle", "slide")
+    animation("specialWorkspace", 3, "settle", "slidevert")
+end
+
+yonux.apply_animations()

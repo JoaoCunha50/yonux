@@ -51,3 +51,11 @@ hl.window_rule({
     idle_inhibit = "fullscreen",
     immediate = true,
 })
+
+hl.window_rule({
+    name = "float-yonux-settings",
+    match = { title = "^yonux settings$" },
+    float = true,
+    size = fit(1080, 760),
+    center = true,
+})

@@ -2,14 +2,16 @@ import QtQuick
 import qs.theme
 
 Text {
-    id: root
+    renderType: Text.NativeRendering
+    renderTypeQuality: Text.HighRenderTypeQuality
 
     font.family: Theme.font.family
-    font.pixelSize: Theme.font.bodySize
-    font.weight: Font.DemiBold
+    font.pixelSize: Theme.font.body.medium
+    font.weight: Theme.font.body.weight
+    font.hintingPreference: Font.PreferDefaultHinting
+
     color: Theme.colors.fg
 
-    // Optional shortcut for style variants
     property bool muted: false
     opacity: muted ? 0.6 : 1.0
 }

@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell.Services.Pipewire
 import qs.theme
 import qs.services
@@ -63,7 +62,7 @@ TrayPopup {
                 }
             }
 
-            Slider {
+            StyledSlider {
                 Layout.fillWidth: true
                 from: 0.0
                 to: 1.0
@@ -86,7 +85,7 @@ TrayPopup {
 
             UIText {
                 text: "Output devices"
-                font.bold: true
+                font.weight: Font.DemiBold
                 color: Theme.colors.active
             }
 
@@ -103,7 +102,7 @@ TrayPopup {
 
             UIText {
                 text: "Microphone"
-                font.bold: true
+                font.weight: Font.DemiBold
                 color: Theme.colors.active
             }
 

@@ -13,6 +13,7 @@ hl.bind(mod .. "+ SHIFT + S", hl.dsp.exec_cmd(paths.hypr .. "/scripts/screenshot
 hl.bind(mod .. "+ S", hl.dsp.exec_cmd(paths.hypr .. "/scripts/screenshot screen"), { description = "Screenshot the focused monitor" })
 hl.bind(mod .. " + G", hl.dsp.exec_cmd(paths.hypr .. "/scripts/game-mode toggle"), { description = "Toggle game mode" })
 hl.bind(mod .. " + Escape", hl.dsp.global("yonux:power"), { description = "Toggle power menu" })
+hl.bind(mod .. " + comma", hl.dsp.global("yonux:settings"), { description = "Toggle settings" })
 hl.bind(mod .. " + SHIFT + Escape", hl.dsp.exit())
 
 -- Windows
@@ -26,7 +27,22 @@ hl.bind(mod .. " + A", function()
     hl.dispatch(hl.dsp.window.center())
 end)
 hl.bind(mod .. " + SHIFT + P", hl.dsp.window.pin())
-hl.bind(mod .. " + T", hl.dsp.layout("togglesplit"))
+
+-- Layout-aware: yonux.layout comes from the settings window (~/.config/yonux/hyprland.lua)
+local function layout()
+    return yonux and yonux.layout or "dwindle"
+end
+
+local layout_toggle = { dwindle = "togglesplit", master = "swapwithmaster", scrolling = "fit active" }
+hl.bind(mod .. " + T", function()
+    hl.dispatch(hl.dsp.layout(layout_toggle[layout()] or "togglesplit"))
+end, { description = "Toggle split, swap with master or fit the column" })
+hl.bind(mod .. " + bracketleft", function()
+    if layout() == "scrolling" then hl.dispatch(hl.dsp.layout("colresize -0.1")) end
+end, { description = "Narrow the column (scrolling)" })
+hl.bind(mod .. " + bracketright", function()
+    if layout() == "scrolling" then hl.dispatch(hl.dsp.layout("colresize +0.1")) end
+end, { description = "Widen the column (scrolling)" })
 
 -- Focus, move and resize with the arrows
 hl.bind(mod .. " + Left", hl.dsp.focus({ direction = "left" }))
