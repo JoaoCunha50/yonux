@@ -8,9 +8,9 @@ uniform sampler2D tex;
 const int RES_SIDE = 1920;
 
 const float GAMMA_SIDE   = 1.10;
-const float VIB_SIDE     = 1.30;
+const float VIB_SIDE     = 1.32;
 const float VIB_MAIN     = 1.15;
-const float BRIGHT_SIDE  = 1.15;
+const float BRIGHT_SIDE  = 1.20;
 const vec3 EYE_SENSITIVITY = vec3(0.299, 0.587, 0.114);
 
 void main() {
