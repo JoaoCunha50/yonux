@@ -3,6 +3,7 @@ import Quickshell
 import qs.theme
 import qs.modules.bar
 import qs.modules.launcher
+import qs.modules.notifications
 import qs.modules.power
 import qs.modules.wallpaper
 import qs.modules.settings
@@ -33,6 +34,8 @@ ShellRoot {
     }
 
     AppLauncher {}
+
+    ToastStack {}
 
     PowerMenu {}
 

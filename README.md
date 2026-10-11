@@ -38,7 +38,7 @@ qs -c yonux ipc call wallpaper set /path/to/image.png
 ## NixOS
 
 `nix/yonux.nix` (exported as `nixosModules.default`) installs everything the
-config calls: clipboard (cliphist + fuzzel), screenshots (grim + slurp), mako,
+config calls: clipboard (cliphist + fuzzel), screenshots (grim + slurp),
 hyprlock + hypridle, media and brightness tools, nautilus, hyprpicker,
 hyprpolkitagent, the cursor and GTK theme, gnome-keyring, bluetooth, upower,
 power-profiles-daemon, gamescope and gamemode. Import it in `/etc/nixos`:
@@ -62,7 +62,6 @@ The `path:` input is a locked copy, so after changing anything in the repo run
 Until yonux has its own, these come from outside the shell:
 
 - lock screen: hyprlock (`hypr/hyprlock.conf`), idle via hypridle (`hypr/hypridle.conf`: lock at 10 min, screen off at 11)
-- notifications: mako
 
 ## Keybinds
 

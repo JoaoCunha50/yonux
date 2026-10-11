@@ -7,7 +7,6 @@
     fuzzel
     grim
     slurp
-    mako
     playerctl
     brightnessctl
     libnotify

@@ -74,8 +74,8 @@ Overlay {
     }
 
     ColumnLayout {
-        width: Screen.width * 0.2
-        height: Screen.height * 0.35
+        width: Screen.width * 0.18
+        height: Screen.height * 0.4
         spacing: 14
 
         TextField {

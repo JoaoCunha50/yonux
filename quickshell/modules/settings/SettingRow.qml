@@ -41,7 +41,7 @@ Rectangle {
     visible: root.store.shown(row)
 
     function format(value: real): string {
-        if (row.pct)
+        if (row.percent)
             return `${Math.round(value * 100)}%`;
         return row.step < 1 ? value.toFixed(2) : `${Math.round(value)}`;
     }
@@ -77,7 +77,7 @@ Rectangle {
                     font: fontPicker,
                     select: select,
                     wallpaper: wallpaper
-                })[root.row.ctl] ?? toggle
+                })[root.row.control] ?? toggle
         }
 
         Reveal {
@@ -165,8 +165,8 @@ Rectangle {
 
             StyledSlider {
                 id: control
-                from: root.row.lo
-                to: root.row.hi
+                from: root.row.min
+                to: root.row.max
                 stepSize: root.row.step
                 snapMode: T.Slider.SnapAlways
                 onMoved: commit.restart()
