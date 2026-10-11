@@ -1,3 +1,4 @@
 .direnv
 hypr/user.lua
 quickshell/.qmlls.ini
+docs/

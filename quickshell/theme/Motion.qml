@@ -1,6 +1,6 @@
 pragma Singleton
 import QtQuick
-import qs.services
+import qs.config
 
 QtObject {
     id: root

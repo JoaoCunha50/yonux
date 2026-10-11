@@ -58,7 +58,7 @@ Overlay {
     }
 
     function launch(entry: DesktopEntry): void {
-        OverlayManager.close();
+        root.close();
         if (entry.runInTerminal) {
             Quickshell.execDetached(["xdg-terminal-exec"].concat(entry.command));
         } else {

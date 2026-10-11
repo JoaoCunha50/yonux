@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Widgets
 import qs.theme
+import qs.config
 import qs.services
 import qs.components
 

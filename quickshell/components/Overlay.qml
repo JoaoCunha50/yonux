@@ -37,9 +37,19 @@ PanelWindow { // qmllint disable uncreatable-type
     onOpenChanged: {
         if (!open)
             return;
-        screen = OverlayManager.focusedScreen;
+        screen = focusedScreen();
         visible = true;
         opened();
+    }
+
+    function close(): void {
+        if (open)
+            OverlayManager.close();
+    }
+
+    function focusedScreen(): var {
+        let monitor = Hyprland.focusedMonitor;
+        return Quickshell.screens.find(screen => screen.name === monitor?.name) ?? Quickshell.screens[0] ?? null;
     }
 
     GlobalShortcut { // qmllint disable unresolved-type
@@ -57,7 +67,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
     MouseArea {
         anchors.fill: parent
-        onClicked: OverlayManager.close()
+        onClicked: root.close()
     }
 
     Reveal {
@@ -67,7 +77,7 @@ PanelWindow { // qmllint disable uncreatable-type
         height: surface.height
         shown: root.open
 
-        Keys.onEscapePressed: OverlayManager.close()
+        Keys.onEscapePressed: root.close()
 
         onActiveChanged: {
             if (active)

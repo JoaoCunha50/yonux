@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import Quickshell
 import qs.theme
+import qs.config
 import qs.services
 import qs.components
 
@@ -15,7 +16,7 @@ Rectangle {
     property var store: HyprSettings
     readonly property var row: modelData
     readonly property var current: root.store.value(row.key)
-    readonly property bool modified: root.store.config.values && !root.store.config.isDefault(row.key)
+    readonly property bool modified: root.store.modified(row.key)
     readonly property bool resettable: row.resettable ?? false
 
     property bool editing: false

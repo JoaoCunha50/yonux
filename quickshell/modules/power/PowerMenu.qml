@@ -50,7 +50,7 @@ Overlay {
     }
 
     function run(action: var): void {
-        OverlayManager.close();
+        root.close();
         Power.run(action);
     }
 

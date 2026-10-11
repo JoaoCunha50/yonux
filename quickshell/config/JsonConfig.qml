@@ -1,17 +1,19 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import qs.services
 
 Item {
     id: root
 
-    required property string path
+    required property string file
     required property var defaults
 
     property var values: defaults
     property bool ready: false
 
-    readonly property string fileName: path.split("/").pop()
+    readonly property string dir: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/yonux"
+    readonly property string path: `${dir}/${file}`
 
     visible: false
 
@@ -35,7 +37,7 @@ Item {
     }
 
     function save(): void {
-        file.setText(JSON.stringify(values, null, 2) + "\n");
+        view.setText(JSON.stringify(values, null, 2) + "\n");
     }
 
     function apply(json: string): void {
@@ -43,7 +45,7 @@ Item {
         try {
             parsed = JSON.parse(json);
         } catch (e) {
-            Alerts.error(`${fileName} is invalid`, `${e}`);
+            Alerts.error(`${file} is invalid`, `${e}`);
             return;
         }
 
@@ -53,7 +55,7 @@ Item {
             let candidate = parsed?.[key];
             let valid = Array.isArray(fallback) ? Array.isArray(candidate) : typeof candidate === typeof fallback;
             if (candidate !== undefined && !valid)
-                Alerts.error(`${fileName} has an invalid value`, key);
+                Alerts.error(`${file} has an invalid value`, key);
             next[key] = candidate !== undefined && valid ? candidate : fallback;
         }
         values = next;
@@ -61,7 +63,7 @@ Item {
     }
 
     FileView {
-        id: file
+        id: view
         path: root.path
         watchChanges: true
         printErrors: false

@@ -2,17 +2,23 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.services
+import qs.config
 
-Singleton {
+SettingsStore {
     id: root
-
-    readonly property alias config: config
 
     readonly property var fontFamilies: [...new Set(Qt.fontFamilies())].sort((a, b) => a.localeCompare(b))
     property var monoFamilies: []
 
-    readonly property var schema: [
+    file: "shell.json"
+
+    // Only on explicit changes, so a fresh install never overrides GTK fonts the user picked elsewhere
+    onEdited: key => {
+        if (key.startsWith("font."))
+            applyGtkFont();
+    }
+
+    schema: [
         {
             section: "Theme",
             key: "wallpaper",
@@ -130,43 +136,10 @@ Singleton {
         }
     ]
 
-    readonly property var defaults: {
-        let result = {};
-        for (let row of schema)
-            if (row.def !== undefined)
-                result[row.key] = row.def;
-        return result;
-    }
-
-    function value(key: string): var {
-        return config.value(key);
-    }
-
-    function set(key: string, value: var): void {
-        config.set(key, value);
-        if (key.startsWith("font."))
-            applyGtkFont();
-    }
-
-    function reset(key: string): void {
-        set(key, defaults[key]);
-    }
-
-    function shown(row: var): bool {
-        return !row.when || value(row.when.key) === row.when.value;
-    }
-
-    // Only on explicit changes, so a fresh install never overrides GTK fonts the user picked elsewhere
     function applyGtkFont(): void {
         let size = Math.round(11 * value("font.scale"));
         Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "font-name", `${value("font.family")} ${size}`]);
         Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "monospace-font-name", `${value("font.mono")} ${size}`]);
-    }
-
-    JsonConfig {
-        id: config
-        path: `${HyprSettings.configDir}/shell.json`
-        defaults: root.defaults
     }
 
     Process {

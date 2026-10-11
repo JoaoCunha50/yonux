@@ -2,17 +2,22 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
 import qs.services
 
-Singleton {
+SettingsStore {
     id: root
 
-    readonly property string configDir: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/yonux"
-    readonly property string luaPath: `${configDir}/hyprland.lua`
+    readonly property string luaPath: `${dir}/hyprland.lua`
 
-    readonly property alias config: config
+    file: "hypr.json"
 
-    readonly property var schema: [
+    onValuesChanged: if (ready)
+        writeLua.restart()
+    onReadyChanged: if (ready)
+        writeLua.restart()
+
+    schema: [
         {
             section: "Theme",
             key: "animations.enabled",
@@ -288,39 +293,16 @@ Singleton {
         }
     ]
 
-    readonly property var defaults: {
-        let result = {};
-        for (let row of schema)
-            result[row.key] = row.def;
-        return result;
-    }
-
-    function value(key: string): var {
-        return config.value(key);
-    }
-
-    function set(key: string, value: var): void {
-        config.set(key, value);
-    }
-
-    function reset(key: string): void {
-        config.reset(key);
-    }
-
-    function shown(row: var): bool {
-        return !row.when || value(row.when.key) === row.when.value;
-    }
-
     function toLua(): string {
         let tree = {};
-        for (let key in config.values) {
+        for (let key in values) {
             if (schema.find(row => row.key === key)?.hyprOption === false)
                 continue;
             let parts = key.split(".");
             let node = tree;
             for (let part of parts.slice(0, -1))
                 node = node[part] = node[part] ?? {};
-            node[parts[parts.length - 1]] = config.values[key];
+            node[parts[parts.length - 1]] = values[key];
         }
 
         let literal = (value, indent) => {
@@ -341,17 +323,6 @@ yonux.animation_speed = ${value("animations.speed")}
 hl.config(${literal(tree, 0)})
 if yonux.apply_animations then yonux.apply_animations() end
 `;
-    }
-
-    JsonConfig {
-        id: config
-        path: `${root.configDir}/hypr.json`
-        defaults: root.defaults
-
-        onValuesChanged: if (ready)
-            writeLua.restart()
-        onReadyChanged: if (ready)
-            writeLua.restart()
     }
 
     Timer {
