@@ -15,3 +15,11 @@
 **Settings store**: a schema of settings backed by one hand-editable JSON file in `~/.config/yonux/` (`SettingsStore`). `ShellSettings` (`shell.json`) and `HyprSettings` (`hypr.json`) are settings stores; each row of the schema becomes a row in the Settings window. `bar.json` is _not_ a settings store: it has no schema, and `BarLayout` owns it.
 
 **hypr.json**: the full file of Hyprland settings the Settings window controls (`~/.config/yonux/hypr.json`), seeded with defaults and editable by hand. `HyprSettings` turns it into `~/.config/yonux/hyprland.lua`, which Hyprland loads after its modules and before `user.lua`, and applies live with `hyprctl eval`. Never edit the generated Lua.
+
+**Notification toast**: a non-modal popup for one incoming notification, stacked at the top right under the Bar (at most three). It closes on its own timeout, on click (running the default action) or on its close button; critical ones stay until closed. Every notification also lands in the history.
+
+**Control center**: the Overlay docked to the right edge (`yonux:controlcenter`, `Super+N`, or the bell Bar widget) holding quick tiles, the volume slider and the notification history as cards. The history persists to `~/.local/state/yonux/notifications.json`; cards restored from a previous session have no actions.
+
+**Do not disturb**: a Control center toggle that hides Notification toasts and silences the notification sound; notifications still reach the history and critical ones still show. Game mode turns it on and off.
+
+**Wallpaper picker**: the Overlay (`yonux:wallpaper`, `Super+W`, or the Wallpaper row in the Settings window) showing a grid of the images in the wallpaper folder, with the matugen controls that shape the Palette. Clicking an image applies it and keeps the picker open.

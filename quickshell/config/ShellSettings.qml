@@ -24,14 +24,14 @@ SettingsStore {
             key: "wallpaper",
             label: "Wallpaper",
             desc: "The colour palette is generated from it",
-            ctl: "wallpaper"
+            control: "wallpaper"
         },
         {
             section: "Theme",
             key: "theme.scheme",
             label: "Color scheme",
             desc: "How matugen turns the wallpaper into a palette",
-            ctl: "select",
+            control: "select",
             resettable: true,
             opts: [
                 {
@@ -82,7 +82,7 @@ SettingsStore {
             key: "font.family",
             label: "Font",
             desc: "Used by the shell and GTK apps",
-            ctl: "font",
+            control: "font",
             resettable: true,
             def: "Google Sans Flex"
         },
@@ -91,7 +91,7 @@ SettingsStore {
             key: "font.mono",
             label: "Monospace font",
             desc: "Used by the shell and as the GTK monospace font",
-            ctl: "font",
+            control: "font",
             mono: true,
             resettable: true,
             def: "JetBrainsMono Nerd Font"
@@ -101,12 +101,12 @@ SettingsStore {
             key: "font.scale",
             label: "Font size",
             desc: "Scales every text size in the shell and GTK apps",
-            ctl: "slider",
+            control: "slider",
             resettable: true,
-            lo: 0.8,
-            hi: 1.5,
+            min: 0.8,
+            max: 1.5,
             step: 0.05,
-            pct: true,
+            percent: true,
             def: 1
         },
         {
@@ -114,12 +114,12 @@ SettingsStore {
             key: "theme.radius",
             label: "Shell corners",
             desc: "Roundness of the bar, popups and controls",
-            ctl: "slider",
+            control: "slider",
             resettable: true,
-            lo: 0,
-            hi: 2,
+            min: 0,
+            max: 2,
             step: 0.05,
-            pct: true,
+            percent: true,
             def: 1
         },
         {
@@ -127,12 +127,24 @@ SettingsStore {
             key: "bar.height",
             label: "Bar height",
             desc: "Text and icons keep their size",
-            ctl: "slider",
+            control: "slider",
             resettable: true,
-            lo: 32,
-            hi: 56,
+            min: 32,
+            max: 56,
             step: 1,
             def: 40
+        },
+        {
+            section: "Notifications",
+            key: "notifications.timeout",
+            label: "Notification timeout",
+            desc: "Seconds a notification stays on screen unless the app sets its own. Critical ones stay until closed",
+            control: "slider",
+            resettable: true,
+            min: 2,
+            max: 15,
+            step: 1,
+            def: 5
         }
     ]
 

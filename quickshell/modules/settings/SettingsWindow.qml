@@ -39,6 +39,10 @@ FloatingWindow { // qmllint disable uncreatable-type
         {
             name: "Bar",
             icon: Icons.bar
+        },
+        {
+            name: "Notifications",
+            icon: Icons.notifications
         }
     ]
 
@@ -146,7 +150,6 @@ FloatingWindow { // qmllint disable uncreatable-type
                         Image {
                             id: face
                             anchors.fill: parent
-                            // Re-read on every open so a new ~/.face shows up without a reload
                             source: root.visible ? UserInfo.face : ""
                             sourceSize: Qt.size(144, 144)
                             fillMode: Image.PreserveAspectCrop

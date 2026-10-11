@@ -35,6 +35,7 @@ QtObject {
     readonly property string person: "person"
     readonly property string editPhoto: "add_a_photo"
     readonly property string info: "info"
+    readonly property string notifications: "notifications"
     readonly property string copy: "content_copy"
     readonly property string openExternal: "open_in_new"
     readonly property string computer: "computer"
