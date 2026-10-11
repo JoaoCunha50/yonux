@@ -18,7 +18,6 @@ hl.bind(mod .. " + SHIFT + Escape", hl.dsp.exit())
 
 -- Windows
 hl.bind(mod .. " + Q", hl.dsp.window.close())
-hl.bind(mod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
 hl.bind(mod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 hl.bind(mod .. " + CTRL + F", hl.dsp.window.fullscreen_state({ internal = 0, client = 2, action = "toggle" }))
 hl.bind(mod .. " + A", function()
@@ -28,20 +27,52 @@ hl.bind(mod .. " + A", function()
 end)
 hl.bind(mod .. " + SHIFT + P", hl.dsp.window.pin())
 
--- Layout-aware: yonux.layout comes from the settings window (~/.config/yonux/hyprland.lua)
 local function layout()
     return yonux and yonux.layout or "dwindle"
 end
 
-local layout_toggle = { dwindle = "togglesplit", master = "swapwithmaster", scrolling = "fit active" }
+yonux = yonux or {}
+yonux.fitted = yonux.fitted or {}
+
+local function set_fitted(value)
+    local window = hl.get_active_window()
+    if window then yonux.fitted[window.address] = value end
+end
+
+hl.bind(mod .. " + F", function()
+    if layout() ~= "scrolling" then
+        hl.dispatch(hl.dsp.window.fullscreen({ mode = "maximized" }))
+        return
+    end
+    local window = hl.get_active_window()
+    if not window then return end
+    if yonux.fitted[window.address] then
+        hl.dispatch(hl.dsp.layout("colresize " .. hl.get_config("scrolling.column_width")))
+        yonux.fitted[window.address] = nil
+    else
+        hl.dispatch(hl.dsp.layout("fit active"))
+        yonux.fitted[window.address] = true
+    end
+end, { description = "Maximize, or fit the column (scrolling)" })
+
+hl.on("window.close", function(window)
+    if window then yonux.fitted[window.address] = nil end
+end)
+
+local layout_toggle = { dwindle = "togglesplit", master = "swapwithmaster" }
 hl.bind(mod .. " + T", function()
-    hl.dispatch(hl.dsp.layout(layout_toggle[layout()] or "togglesplit"))
-end, { description = "Toggle split, swap with master or fit the column" })
+    local action = layout_toggle[layout()]
+    if action then hl.dispatch(hl.dsp.layout(action)) end
+end, { description = "Toggle split or swap with master" })
 hl.bind(mod .. " + bracketleft", function()
-    if layout() == "scrolling" then hl.dispatch(hl.dsp.layout("colresize -0.1")) end
+    if layout() ~= "scrolling" then return end
+    hl.dispatch(hl.dsp.layout("colresize -0.1"))
+    set_fitted(nil)
 end, { description = "Narrow the column (scrolling)" })
 hl.bind(mod .. " + bracketright", function()
-    if layout() == "scrolling" then hl.dispatch(hl.dsp.layout("colresize +0.1")) end
+    if layout() ~= "scrolling" then return end
+    hl.dispatch(hl.dsp.layout("colresize +0.1"))
+    set_fitted(nil)
 end, { description = "Widen the column (scrolling)" })
 
 -- Focus, move and resize with the arrows

@@ -59,3 +59,11 @@ hl.window_rule({
     size = fit(1080, 760),
     center = true,
 })
+
+-- Vesktop's splash is fixed-size; dwindle floats it on its own, scrolling tiles it full-screen.
+hl.window_rule({
+    name = "float-vesktop-splash",
+    match = { class = "^vesktop$", title = "^vesktop$" },
+    float = true,
+    center = true,
+})

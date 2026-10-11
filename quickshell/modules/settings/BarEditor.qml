@@ -8,30 +8,9 @@ import qs.modules.bar
 RowLayout {
     id: root
 
-    readonly property var config: BarLayout.config
-    readonly property var used: [...config.values.left, ...config.values.center, ...config.values.right]
-    readonly property var available: Object.keys(BarModel.items).filter(id => !used.includes(id)).sort()
+    readonly property var available: Object.keys(BarModel.items).filter(id => !BarLayout.used.includes(id)).sort()
 
     spacing: Theme.spacing.md
-
-    function move(section: string, index: int, delta: int): void {
-        let ids = [...config.values[section]];
-        let target = index + delta;
-        if (target < 0 || target >= ids.length)
-            return;
-        [ids[index], ids[target]] = [ids[target], ids[index]];
-        config.set(section, ids);
-    }
-
-    function remove(section: string, index: int): void {
-        let ids = [...config.values[section]];
-        ids.splice(index, 1);
-        config.set(section, ids);
-    }
-
-    function add(section: string, id: string): void {
-        config.set(section, [...config.values[section], id]);
-    }
 
     Repeater {
         model: [
@@ -53,7 +32,7 @@ RowLayout {
             id: column
 
             required property var modelData
-            readonly property var ids: root.config.values[modelData.key]
+            readonly property var ids: BarLayout[modelData.key]
 
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop
@@ -94,18 +73,18 @@ RowLayout {
                         IconButton {
                             icon.name: Icons.arrowUp
                             enabled: entry.index > 0
-                            onClicked: root.move(column.modelData.key, entry.index, -1)
+                            onClicked: BarLayout.move(column.modelData.key, entry.index, -1)
                         }
 
                         IconButton {
                             icon.name: Icons.arrowDown
                             enabled: entry.index < column.ids.length - 1
-                            onClicked: root.move(column.modelData.key, entry.index, 1)
+                            onClicked: BarLayout.move(column.modelData.key, entry.index, 1)
                         }
 
                         IconButton {
                             icon.name: Icons.close
-                            onClicked: root.remove(column.modelData.key, entry.index)
+                            onClicked: BarLayout.remove(column.modelData.key, entry.index)
                         }
                     }
                 }
@@ -124,7 +103,7 @@ RowLayout {
 
                     IconButton {
                         icon.name: Icons.add
-                        onClicked: root.add(column.modelData.key, picker.currentText)
+                        onClicked: BarLayout.add(column.modelData.key, picker.currentText)
                     }
                 }
             }
