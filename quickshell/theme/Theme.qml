@@ -2,7 +2,6 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 import QtQuick
 import qs.config
-import qs.theme
 
 QtObject {
     id: root
