@@ -181,7 +181,6 @@ Overlay {
                     }
 
                     UIText {
-                        renderType: Text.QtRendering
                         font.pixelSize: Theme.font.label.large
                         font.weight: Theme.font.label.weight
 

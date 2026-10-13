@@ -74,7 +74,6 @@ Rectangle {
             sourceComponent: ({
                     seg: segmented,
                     slider: slider,
-                    font: fontPicker,
                     select: select,
                     wallpaper: wallpaper
                 })[root.row.control] ?? toggle
@@ -204,21 +203,6 @@ Rectangle {
         StyledSwitch {
             checked: root.current
             onToggled: root.store.set(root.row.key, checked)
-        }
-    }
-
-    Component {
-        id: fontPicker
-
-        StyledSelect {
-            readonly property var families: root.row.mono ? ShellSettings.monoFamilies : ShellSettings.fontFamilies
-
-            implicitWidth: 260
-            previewFont: true
-            model: families
-            currentIndex: families.indexOf(root.current)
-            displayText: root.current
-            onActivated: index => root.store.set(root.row.key, families[index])
         }
     }
 

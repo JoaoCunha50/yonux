@@ -44,6 +44,8 @@
         settings."org/gnome/desktop/interface" = {
           color-scheme = "prefer-dark";
           gtk-theme = "adw-gtk3-dark";
+          font-name = "Google Sans Flex 11";
+          monospace-font-name = "JetBrainsMono Nerd Font 11";
         };
       }
     ];

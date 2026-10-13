@@ -1,14 +1,11 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Io
+import qs.theme
 import qs.config
 
 SettingsStore {
     id: root
-
-    readonly property var fontFamilies: [...new Set(Qt.fontFamilies())].sort((a, b) => a.localeCompare(b))
-    property var monoFamilies: []
 
     file: "shell.json"
 
@@ -79,25 +76,6 @@ SettingsStore {
         },
         {
             section: "Theme",
-            key: "font.family",
-            label: "Font",
-            desc: "Used by the shell and GTK apps",
-            control: "font",
-            resettable: true,
-            def: "Google Sans Flex"
-        },
-        {
-            section: "Theme",
-            key: "font.mono",
-            label: "Monospace font",
-            desc: "Used by the shell and as the GTK monospace font",
-            control: "font",
-            mono: true,
-            resettable: true,
-            def: "JetBrainsMono Nerd Font"
-        },
-        {
-            section: "Theme",
             key: "font.scale",
             label: "Font size",
             desc: "Scales every text size in the shell and GTK apps",
@@ -150,19 +128,7 @@ SettingsStore {
 
     function applyGtkFont(): void {
         let size = Math.round(11 * value("font.scale"));
-        Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "font-name", `${value("font.family")} ${size}`]);
-        Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "monospace-font-name", `${value("font.mono")} ${size}`]);
-    }
-
-    Process {
-        running: true
-        command: ["fc-list", ":spacing=mono:scalable=true", "family"]
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                let families = this.text.split("\n").map(line => line.split(",")[0].trim()).filter(name => name !== "" && !name.includes("Emoji"));
-                root.monoFamilies = [...new Set(families)].sort((a, b) => a.localeCompare(b));
-            }
-        }
+        Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "font-name", `${Theme.font.family} ${size}`]);
+        Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "monospace-font-name", `${Theme.font.mono} ${size}`]);
     }
 }

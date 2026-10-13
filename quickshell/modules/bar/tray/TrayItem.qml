@@ -1,6 +1,5 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Layouts
 import qs.theme
 import qs.components
 
@@ -59,24 +58,33 @@ Item {
         }
     }
 
-    RowLayout {
+    Item {
         id: row
-        anchors.centerIn: parent
+        x: Math.round((root.width - width) / 2)
+        height: root.height
+        implicitWidth: (iconItem.visible ? iconItem.implicitWidth : 0) + (iconItem.visible && label.visible ? 5 : 0) + (label.visible ? label.implicitWidth : 0)
+        width: implicitWidth
         visible: root.hasLabel
-        spacing: 5
 
         ShellIcon {
             id: iconItem
+            anchors.verticalCenter: parent.verticalCenter
             visible: icon.name !== ""
             icon.size: 18
             icon.color: root.contentColor
         }
 
         UIText {
+            id: label
+            anchors.left: iconItem.visible ? iconItem.right : parent.left
+            anchors.leftMargin: iconItem.visible ? 5 : 0
+            anchors.baseline: parent.verticalCenter
+            anchors.baselineOffset: capOffset
             visible: root.text !== ""
             text: root.text
             color: root.contentColor
             font.pixelSize: root.textSize
+            font.weight: 550
         }
     }
 

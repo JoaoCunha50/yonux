@@ -14,4 +14,6 @@ Text {
 
     property bool muted: false
     opacity: muted ? 0.6 : 1.0
+
+    readonly property int capOffset: Math.round(font.pixelSize * 0.35)
 }

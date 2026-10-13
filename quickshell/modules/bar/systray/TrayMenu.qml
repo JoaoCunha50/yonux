@@ -70,9 +70,11 @@ TrayPopup {
             anchors.leftMargin: 8
             anchors.right: trailingIcon.left
             anchors.rightMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.baseline: parent.verticalCenter
+            anchors.baselineOffset: capOffset
             elide: Text.ElideRight
             text: row.text
+            font.weight: 550
         }
 
         ShellIcon {

@@ -18,8 +18,8 @@ QtObject {
     component FontTokens: QtObject {
         id: tokens
 
-        readonly property string family: ShellSettings.value("font.family")
-        readonly property string mono: ShellSettings.value("font.mono")
+        readonly property string family: "Google Sans Flex"
+        readonly property string mono: "JetBrainsMono Nerd Font"
         readonly property real scale: ShellSettings.value("font.scale")
 
         function px(size: int): int {

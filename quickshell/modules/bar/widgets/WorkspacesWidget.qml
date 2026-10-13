@@ -40,8 +40,7 @@ TrayItem {
                     anchors.centerIn: parent
                     text: button.modelData.name
                     font.pixelSize: Theme.font.label.large
-                    font.weight: Theme.font.label.weight
-                    font.bold: button.active
+                    font.weight: button.active ? Font.DemiBold : Font.Normal
                     color: button.active ? Theme.colors.active : Theme.colors.fg
                 }
 

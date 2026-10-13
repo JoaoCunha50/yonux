@@ -6,7 +6,6 @@ import qs.theme
 T.ComboBox {
     id: root
 
-    property bool previewFont: false
 
     implicitWidth: 180
     implicitHeight: 34
@@ -58,7 +57,6 @@ T.ComboBox {
 
         contentItem: UIText {
             text: option.modelData
-            font.family: root.previewFont ? option.modelData : Theme.font.family
             verticalAlignment: Text.AlignVCenter
             color: root.currentIndex === option.index ? Theme.colors.active : Theme.colors.fg
         }
