@@ -12,6 +12,7 @@ hl.bind(mod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"), { description =
 hl.bind(mod .. "+ SHIFT + S", hl.dsp.exec_cmd(paths.hypr .. "/scripts/screenshot area"), { description = "Screenshot an area" })
 hl.bind(mod .. "+ S", hl.dsp.exec_cmd(paths.hypr .. "/scripts/screenshot screen"), { description = "Screenshot the focused monitor" })
 hl.bind(mod .. " + G", hl.dsp.exec_cmd(paths.hypr .. "/scripts/game-mode toggle"), { description = "Toggle game mode" })
+hl.bind(mod .. " + N", hl.dsp.global("yonux:controlcenter"), { description = "Toggle control center" })
 hl.bind(mod .. " + Escape", hl.dsp.global("yonux:power"), { description = "Toggle power menu" })
 hl.bind(mod .. " + comma", hl.dsp.global("yonux:settings"), { description = "Toggle settings" })
 hl.bind(mod .. " + SHIFT + Escape", hl.dsp.exit())

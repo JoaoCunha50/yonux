@@ -31,6 +31,7 @@ Singleton {
             disk: disk,
             temperature: temperature,
             battery: battery,
+            notifications: notifications,
             power: power
         })
 
@@ -141,6 +142,11 @@ Singleton {
     Component {
         id: battery
         BatteryWidget {}
+    }
+
+    Component {
+        id: notifications
+        NotificationsWidget {}
     }
 
     Component {

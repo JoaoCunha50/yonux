@@ -15,6 +15,7 @@ Singleton {
     readonly property bool connected: ethernet || wifiNetwork !== null
     readonly property bool limited: connected && (Networking.connectivity === NetworkConnectivity.Limited || Networking.connectivity === NetworkConnectivity.Portal)
     readonly property real signal: wifiNetwork?.signalStrength ?? 0
+    readonly property bool wifiEnabled: Networking.wifiEnabled
 
     readonly property string label: {
         if (ethernet)
@@ -24,5 +25,9 @@ Singleton {
         if (wifi && !Networking.wifiEnabled)
             return "Wi-Fi off";
         return "Disconnected";
+    }
+
+    function toggleWifi(): void {
+        Networking.wifiEnabled = !Networking.wifiEnabled;
     }
 }
