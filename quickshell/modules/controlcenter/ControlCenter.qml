@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Widgets
 import qs.components
 import qs.services
 import qs.theme
@@ -32,6 +33,69 @@ Overlay {
         width: parent.width
         height: parent.height
         spacing: Theme.spacing.lg
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Theme.spacing.md
+
+            ClippingRectangle {
+                implicitWidth: 44
+                implicitHeight: 44
+                radius: 22
+                color: Theme.colors.field
+
+                ShellIcon {
+                    anchors.centerIn: parent
+                    visible: face.status !== Image.Ready
+                    icon.name: Icons.person
+                    icon.size: 24
+                    icon.color: Theme.colors.fgMuted
+                }
+
+                Image {
+                    id: face
+                    anchors.fill: parent
+                    source: root.open ? UserInfo.face : ""
+                    sourceSize: Qt.size(88, 88)
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    cache: false
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+
+                UIText {
+                    Layout.fillWidth: true
+                    text: UserInfo.username
+                    font.pixelSize: Theme.font.title.small
+                    font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                }
+
+                UIText {
+                    Layout.fillWidth: true
+                    text: `up ${SystemInfo.uptime}`
+                    font.pixelSize: Theme.font.label.medium
+                    muted: true
+                }
+            }
+
+            IconButton {
+                icon.name: Icons.settings
+                onClicked: {
+                    OverlayManager.close();
+                    OverlayManager.settingsRequested();
+                }
+            }
+
+            IconButton {
+                icon.name: Icons.power
+                onClicked: OverlayManager.open("power")
+            }
+        }
 
         GridLayout {
             Layout.fillWidth: true
@@ -112,8 +176,10 @@ Overlay {
                 font.weight: Font.DemiBold
             }
 
-            IconButton {
+            ShellButton {
                 visible: Notifications.history.length > 0
+                muted: true
+                text: "Clear all"
                 icon.name: Icons.clearAll
                 onClicked: Notifications.clear()
             }

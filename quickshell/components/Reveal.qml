@@ -7,63 +7,23 @@ Item {
     property bool shown: false
     property real hiddenScale: Motion.revealScale
     property real hiddenOffset: Motion.revealOffset
-    readonly property bool active: shown || opacity > 0
+    property real hiddenOffsetX: 0
+    property real hiddenOpacity: 0
+    property real progress: shown ? 1 : 0
+    readonly property bool active: shown || progress > 0
 
-    opacity: 0
-    scale: hiddenScale
+    opacity: hiddenOpacity + (1 - hiddenOpacity) * progress
+    scale: hiddenScale + (1 - hiddenScale) * progress
     transform: Translate {
-        id: slide
-        y: root.hiddenOffset
+        x: root.hiddenOffsetX * (1 - root.progress)
+        y: root.hiddenOffset * (1 - root.progress)
     }
 
-    states: State {
-        name: "shown"
-        when: root.shown
-        PropertyChanges {
-            root.opacity: 1
-            root.scale: 1
-            slide.y: 0
+    Behavior on progress {
+        NumberAnimation {
+            duration: root.shown ? Motion.enter : Motion.exit
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.shown ? Motion.emphasizedDecelerate : Motion.emphasizedAccelerate
         }
     }
-
-    transitions: [
-        Transition {
-            to: "shown"
-            ParallelAnimation {
-                NumberAnimation {
-                    target: root
-                    properties: "opacity,scale"
-                    duration: Motion.enter
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.emphasizedDecelerate
-                }
-                NumberAnimation {
-                    target: slide
-                    property: "y"
-                    duration: Motion.enter
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.emphasizedDecelerate
-                }
-            }
-        },
-        Transition {
-            from: "shown"
-            ParallelAnimation {
-                NumberAnimation {
-                    target: root
-                    properties: "opacity,scale"
-                    duration: Motion.exit
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.emphasizedAccelerate
-                }
-                NumberAnimation {
-                    target: slide
-                    property: "y"
-                    duration: Motion.exit
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.emphasizedAccelerate
-                }
-            }
-        }
-    ]
 }

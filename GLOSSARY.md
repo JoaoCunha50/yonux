@@ -18,7 +18,7 @@
 
 **Notification toast**: a non-modal popup for one incoming notification, stacked at the top right under the Bar (at most three). It closes on its own timeout, on click (running the default action) or on its close button; critical ones stay until closed. Every notification also lands in the history.
 
-**Control center**: the Overlay docked to the right edge (`yonux:controlcenter`, `Super+N`, or the bell Bar widget) holding quick tiles, the volume slider and the notification history as cards grouped by app. The history persists to `~/.local/state/yonux/notifications.json`; cards restored from a previous session are _inactive_: the app that sent them is gone, so they have no actions.
+**Control center**: the Overlay docked to the right edge (`yonux:controlcenter`, `Super+C`, or the bell Bar widget) holding quick tiles, the volume slider and the notification history as cards grouped by app. The history persists to `~/.local/state/yonux/notifications.json`; cards restored from a previous session are _inactive_: the app that sent them is gone, so they have no actions.
 
 **Do not disturb**: a Control center toggle that hides Notification toasts and silences the notification sound; notifications still reach the history, and critical ones and the shell's own (`yonux`) still show. Game mode turns it on and, on exit, restores what it was before. Persists across reboots in `~/.local/state/yonux/state.json`.
 

@@ -6,6 +6,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.Notifications
 import qs.components
+import qs.services
 
 Singleton {
     id: root
@@ -37,8 +38,12 @@ Singleton {
     readonly property real lastSeen: saved.lastSeen
     readonly property bool unread: history.some(entry => entry.time > lastSeen)
 
-    onPanelOpenChanged: if (!panelOpen)
-        saved.lastSeen = Date.now()
+    onPanelOpenChanged: {
+        if (panelOpen)
+            popupIds = [];
+        else
+            saved.lastSeen = Date.now();
+    }
 
     function setDnd(value: bool): void {
         saved.dnd = value;
@@ -208,6 +213,7 @@ Singleton {
                 color: "transparent"
                 exclusiveZone: 0
                 mask: Region {}
+
                 WlrLayershell.namespace: "yonux-image-cache"
 
                 Image {
@@ -232,7 +238,9 @@ Singleton {
                         interval: 50
                         repeat: true
                         onTriggered: {
-                            let path = `${root.imageDir}/${Qt.md5(entry.time + entry.appName + entry.summary + entry.image)}.png`;
+                            let sha = Qt.md5(entry.time + entry.appName + entry.summary + entry.image);
+                            let path = `${root.imageDir}/${sha}.png`;
+
                             let started = picture.grabToImage(result => {
                                 if (result.saveToFile(path)) {
                                     entry.image = path;
@@ -240,6 +248,7 @@ Singleton {
                                 }
                                 entry.cacher.active = false;
                             }, Qt.size(80, 80));
+
                             if (started)
                                 stop();
                         }

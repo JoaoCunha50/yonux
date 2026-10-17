@@ -17,7 +17,9 @@ TrayItem {
         spacing: 0
 
         Repeater {
-            model: root.workspaces
+            model: ScriptModel {
+                values: root.workspaces
+            }
 
             delegate: Rectangle {
                 id: button
