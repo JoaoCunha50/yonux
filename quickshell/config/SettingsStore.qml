@@ -5,10 +5,9 @@ import qs.config
 Singleton {
     id: root
 
-    required property string file
+    required property string path
     property list<Setting> settings: []
 
-    readonly property string dir: config.dir
     readonly property var values: config.values
     readonly property bool ready: config.ready
 
@@ -48,7 +47,7 @@ Singleton {
 
     JsonConfig {
         id: config
-        file: root.file
+        path: root.path
         defaults: root.defaults
     }
 }

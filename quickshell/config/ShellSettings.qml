@@ -7,7 +7,7 @@ import qs.theme
 SettingsStore {
     id: root
 
-    file: "shell.json"
+    path: `${Paths.config}/shell.json`
 
     // Only on explicit changes, so a fresh install never overrides GTK fonts the user picked elsewhere
     onEdited: key => {

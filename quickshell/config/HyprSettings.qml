@@ -8,9 +8,8 @@ import qs.services
 SettingsStore {
     id: root
 
-    readonly property string luaPath: `${dir}/hyprland.lua`
-
-    file: "hypr.json"
+    readonly property string luaPath: `${Paths.config}/hyprland.lua`
+    path: `${Paths.config}/hypr.json`
 
     onValuesChanged: if (ready)
         writeLua.restart()

@@ -2,9 +2,9 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.Notifications
+import qs.config
 import qs.services
 
 Singleton {
@@ -12,8 +12,7 @@ Singleton {
 
     readonly property int maxToasts: 3
     readonly property int maxHistory: 100
-    readonly property string stateDir: `${Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state"}/yonux`
-    readonly property string imageDir: `${stateDir}/notification-images`
+    readonly property string imageDir: `${Paths.state}/notification-images`
 
     property bool viewing: false
 
@@ -34,23 +33,40 @@ Singleton {
                 }));
     }
 
-    readonly property bool dnd: root.saved.dnd
-    readonly property real lastSeen: root.saved.lastSeen
+    readonly property bool dnd: savedState.value("dnd")
+    readonly property real lastSeen: savedState.value("lastSeen")
     readonly property bool unread: history.some(entry => entry.time > lastSeen)
 
     property alias toastIds: persist.toastIds
-
-    readonly property SavedState saved: SavedState {}
 
     onViewingChanged: {
         if (viewing)
             toastIds = [];
         else
-            root.saved.lastSeen = Date.now();
+            savedState.set("lastSeen", Date.now());
+    }
+
+    function saveHistory(): void {
+        historyFile.save(history.map(entry => entry.toJSON()));
+    }
+
+    function restore(saved: var): void {
+        let restored = [];
+        for (let data of saved.slice(0, maxHistory)) {
+            let live = entries.find(entry => entry.notificationId === data.notificationId && entry.summary === data.summary);
+            if (live) {
+                live.time = data.time;
+                if (data.image)
+                    live.image = data.image;
+            } else {
+                restored.push(entryComponent.createObject(root, data));
+            }
+        }
+        entries = [...entries, ...restored].sort((a, b) => b.time - a.time);
     }
 
     function setDnd(value: bool): void {
-        root.saved.dnd = value;
+        savedState.set("dnd", value);
     }
 
     function dismissGroup(appName: string): void {
@@ -76,7 +92,7 @@ Singleton {
                 Quickshell.execDetached(["rm", "-f", entry.image]);
             entry.destroy();
         }
-        saveTimer.restart();
+        root.saveHistory();
     }
 
     function showToast(entry: NotificationEntry): void {
@@ -96,7 +112,7 @@ Singleton {
         if (viewing)
             return true;
         let silenced = notification.urgency !== NotificationUrgency.Critical && notification.appName !== "yonux";
-        return root.saved.dnd && silenced;
+        return dnd && silenced;
     }
 
     function receive(notification: Notification): void {
@@ -118,21 +134,21 @@ Singleton {
         entries = [entry, ...entries];
         remove(history.slice(maxHistory));
         entry.cacheImage();
-        saveTimer.restart();
+        root.saveHistory();
 
         if (!notification.lastGeneration && !isQuiet(notification))
             showToast(entry);
     }
 
     function syncGameMode(): void {
-        if (!GameMode.ready || GameMode.active === root.saved.gameMode)
+        if (!GameMode.ready || !savedState.ready || GameMode.active === savedState.value("gameMode"))
             return;
-        root.saved.gameMode = GameMode.active;
+        savedState.set("gameMode", GameMode.active);
         if (GameMode.active) {
-            root.saved.dndBeforeGameMode = root.saved.dnd;
-            root.saved.dnd = true;
+            savedState.set("dndBeforeGameMode", dnd);
+            savedState.set("dnd", true);
         } else {
-            root.saved.dnd = root.saved.dndBeforeGameMode;
+            savedState.set("dnd", savedState.value("dndBeforeGameMode"));
         }
     }
 
@@ -146,13 +162,6 @@ Singleton {
         function onReadyChanged(): void {
             root.syncGameMode();
         }
-    }
-
-    component SavedState: JsonAdapter {
-        property bool dnd: false
-        property bool dndBeforeGameMode: false
-        property bool gameMode: false
-        property real lastSeen: 0
     }
 
     component NotificationEntry: QtObject {
@@ -272,7 +281,7 @@ Singleton {
                             let started = picture.grabToImage(result => {
                                 if (result.saveToFile(path)) {
                                     entry.image = path;
-                                    saveTimer.restart();
+                                    root.saveHistory();
                                 }
                                 entry.imageCache.active = false;
                             }, Qt.size(80, 80));
@@ -297,41 +306,24 @@ Singleton {
         property list<int> toastIds: []
     }
 
-    FileView {
-        path: `${root.stateDir}/state.json`
-        blockLoading: true
-        printErrors: false
-
-        adapter: root.saved // qmllint disable
-        onAdapterUpdated: writeAdapter()
-        onLoadFailed: error => {
-            if (error === FileViewError.FileNotFound)
-                writeAdapter();
-        }
+    JsonConfig {
+        id: savedState
+        path: `${Paths.state}/state.json`
+        defaults: ({
+                dnd: false,
+                dndBeforeGameMode: false,
+                gameMode: false,
+                lastSeen: 0
+            })
     }
 
-    FileView {
+    JsonFile {
         id: historyFile
-        path: `${root.stateDir}/notifications.json`
-        blockLoading: true
-        printErrors: false
+        path: `${Paths.state}/notifications.json`
+        saveDelay: 1000
 
-        onLoaded: {
-            let restored;
-            try {
-                restored = JSON.parse(text());
-            } catch (e) {
-                return;
-            }
-            if (Array.isArray(restored))
-                root.entries = restored.slice(0, root.maxHistory).map(data => entryComponent.createObject(root, data));
-        }
-    }
-
-    Timer {
-        id: saveTimer
-        interval: 1000
-        onTriggered: historyFile.setText(JSON.stringify(root.history.map(entry => entry.toJSON()), null, 2) + "\n")
+        onDocumentLoaded: if (Array.isArray(document))
+            root.restore(document)
     }
 
     NotificationServer {

@@ -32,7 +32,7 @@ Singleton {
 
     JsonConfig {
         id: config
-        file: "bar.json"
+        path: `${Paths.config}/bar.json`
         defaults: ({
                 left: ["workspaces", "separator"],
                 center: ["clock"],
