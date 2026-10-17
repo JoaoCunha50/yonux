@@ -64,64 +64,61 @@ SettingsStore {
         }
     }
 
-    schema: [
-        {
-            section: "Theme",
-            key: "cursor.theme",
-            label: "Cursor theme",
-            desc: "Applies to Hyprland; GTK apps need a matching XCursor theme",
-            control: "select",
-            resettable: true,
-            hyprOption: false,
-            opts: () => root.cursorOptions,
-            def: "Bibata-Modern-Ice"
+    settings: [
+        Setting {
+            key: "cursor.theme"
+            section: "Theme"
+            label: "Cursor theme"
+            desc: "Applies to Hyprland; GTK apps need a matching XCursor theme"
+            control: Setting.Select
+            resettable: true
+            hyprOption: false
+            options: root.cursorOptions
+            defaultValue: "Bibata-Modern-Ice"
         },
-        {
-            section: "Theme",
-            key: "cursor.size",
-            label: "Cursor size",
-            desc: "Base size in pixels; monitor scaling also affects the result",
-            control: "slider",
-            resettable: true,
-            hyprOption: false,
-            min: 16,
-            max: 64,
-            step: 1,
-            def: 22
+        Setting {
+            key: "cursor.size"
+            section: "Theme"
+            label: "Cursor size"
+            desc: "Base size in pixels; monitor scaling also affects the result"
+            control: Setting.Slider
+            resettable: true
+            hyprOption: false
+            min: 16
+            max: 64
+            step: 1
+            defaultValue: 22
         },
-        {
-            section: "Theme",
-            key: "animations.enabled",
-            label: "Animations",
-            desc: "Window and shell animations",
-            control: "switch",
-            def: true
+        Setting {
+            key: "animations.enabled"
+            section: "Theme"
+            label: "Animations"
+            desc: "Window and shell animations"
+            control: Setting.Switch
+            defaultValue: true
         },
-        {
-            section: "Theme",
-            key: "animations.speed",
-            label: "Animation speed",
-            desc: "Scales how fast windows and the shell animate",
-            control: "slider",
-            resettable: true,
-            min: 0.25,
-            max: 2,
-            step: 0.05,
-            percent: true,
-            def: 1,
-            hyprOption: false,
-            when: {
-                key: "animations.enabled",
-                value: true
-            }
+        Setting {
+            key: "animations.speed"
+            section: "Theme"
+            label: "Animation speed"
+            desc: "Scales how fast windows and the shell animate"
+            control: Setting.Slider
+            resettable: true
+            hyprOption: false
+            min: 0.25
+            max: 2
+            step: 0.05
+            percent: true
+            defaultValue: 1
+            shown: root.value("animations.enabled") === true
         },
-        {
-            section: "Layout",
-            key: "general.layout",
-            label: "Tiling layout",
-            desc: "Binary splits, a master and stack, or one endless horizontal strip",
-            control: "seg",
-            opts: [
+        Setting {
+            key: "general.layout"
+            section: "Layout"
+            label: "Tiling layout"
+            desc: "Binary splits, a master and stack, or one endless horizontal strip"
+            control: Setting.Segmented
+            options: [
                 {
                     value: "dwindle",
                     label: "Dwindle"
@@ -134,195 +131,177 @@ SettingsStore {
                     value: "scrolling",
                     label: "Scrolling"
                 }
-            ],
-            def: "dwindle"
+            ]
+            defaultValue: "dwindle"
         },
-        {
-            section: "Layout",
-            key: "scrolling.column_width",
-            label: "Column width",
-            desc: "Share of the screen each new column takes",
-            control: "slider",
-            resettable: true,
-            min: 0.1,
-            max: 1,
-            step: 0.05,
-            percent: true,
-            def: 0.5,
-            when: {
-                key: "general.layout",
-                value: "scrolling"
-            }
+        Setting {
+            key: "scrolling.column_width"
+            section: "Layout"
+            label: "Column width"
+            desc: "Share of the screen each new column takes"
+            control: Setting.Slider
+            resettable: true
+            min: 0.1
+            max: 1
+            step: 0.05
+            percent: true
+            defaultValue: 0.5
+            shown: root.value("general.layout") === "scrolling"
         },
-        {
-            section: "Layout",
-            key: "scrolling.follow_focus",
-            label: "Follow focus",
-            desc: "Pan the strip to keep the focused column in view",
-            control: "switch",
-            def: true,
-            when: {
-                key: "general.layout",
-                value: "scrolling"
-            }
+        Setting {
+            key: "scrolling.follow_focus"
+            section: "Layout"
+            label: "Follow focus"
+            desc: "Pan the strip to keep the focused column in view"
+            control: Setting.Switch
+            defaultValue: true
+            shown: root.value("general.layout") === "scrolling"
         },
-        {
-            section: "Layout",
-            key: "dwindle.preserve_split",
-            label: "Preserve split",
-            desc: "Keep the split direction when windows close and reopen",
-            control: "switch",
-            def: true,
-            when: {
-                key: "general.layout",
-                value: "dwindle"
-            }
+        Setting {
+            key: "dwindle.preserve_split"
+            section: "Layout"
+            label: "Preserve split"
+            desc: "Keep the split direction when windows close and reopen"
+            control: Setting.Switch
+            defaultValue: true
+            shown: root.value("general.layout") === "dwindle"
         },
-        {
-            section: "Windows",
-            key: "general.gaps_in",
-            label: "Inner gaps",
-            desc: "Space between windows",
-            control: "slider",
-            resettable: true,
-            min: 0,
-            max: 30,
-            step: 1,
-            def: 10
+        Setting {
+            key: "general.gaps_in"
+            section: "Windows"
+            label: "Inner gaps"
+            desc: "Space between windows"
+            control: Setting.Slider
+            resettable: true
+            min: 0
+            max: 30
+            step: 1
+            defaultValue: 10
         },
-        {
-            section: "Windows",
-            key: "general.gaps_out",
-            label: "Outer gaps",
-            desc: "Space between windows and the screen edge",
-            control: "slider",
-            resettable: true,
-            min: 0,
-            max: 50,
-            step: 1,
-            def: 15
+        Setting {
+            key: "general.gaps_out"
+            section: "Windows"
+            label: "Outer gaps"
+            desc: "Space between windows and the screen edge"
+            control: Setting.Slider
+            resettable: true
+            min: 0
+            max: 50
+            step: 1
+            defaultValue: 15
         },
-        {
-            section: "Windows",
-            key: "general.border_size",
-            label: "Border width",
-            desc: "Thickness of the window border",
-            control: "slider",
-            resettable: true,
-            min: 0,
-            max: 8,
-            step: 1,
-            def: 2
+        Setting {
+            key: "general.border_size"
+            section: "Windows"
+            label: "Border width"
+            desc: "Thickness of the window border"
+            control: Setting.Slider
+            resettable: true
+            min: 0
+            max: 8
+            step: 1
+            defaultValue: 2
         },
-        {
-            section: "Windows",
-            key: "decoration.rounding",
-            label: "Corner radius",
-            desc: "Roundness of window corners",
-            control: "slider",
-            resettable: true,
-            min: 0,
-            max: 30,
-            step: 1,
-            def: 10
+        Setting {
+            key: "decoration.rounding"
+            section: "Windows"
+            label: "Corner radius"
+            desc: "Roundness of window corners"
+            control: Setting.Slider
+            resettable: true
+            min: 0
+            max: 30
+            step: 1
+            defaultValue: 10
         },
-        {
-            section: "Windows",
-            key: "decoration.active_opacity",
-            label: "Active opacity",
-            desc: "Opacity of the focused window",
-            control: "slider",
-            resettable: true,
-            min: 0.5,
-            max: 1,
-            step: 0.05,
-            percent: true,
-            def: 1
+        Setting {
+            key: "decoration.active_opacity"
+            section: "Windows"
+            label: "Active opacity"
+            desc: "Opacity of the focused window"
+            control: Setting.Slider
+            resettable: true
+            min: 0.5
+            max: 1
+            step: 0.05
+            percent: true
+            defaultValue: 1
         },
-        {
-            section: "Windows",
-            key: "decoration.inactive_opacity",
-            label: "Inactive opacity",
-            desc: "Opacity of unfocused windows",
-            control: "slider",
-            resettable: true,
-            min: 0.5,
-            max: 1,
-            step: 0.05,
-            percent: true,
-            def: 1
+        Setting {
+            key: "decoration.inactive_opacity"
+            section: "Windows"
+            label: "Inactive opacity"
+            desc: "Opacity of unfocused windows"
+            control: Setting.Slider
+            resettable: true
+            min: 0.5
+            max: 1
+            step: 0.05
+            percent: true
+            defaultValue: 1
         },
-        {
-            section: "Effects",
-            key: "decoration.blur.enabled",
-            label: "Blur",
-            desc: "Blur what is behind translucent windows",
-            control: "switch",
-            def: true
+        Setting {
+            key: "decoration.blur.enabled"
+            section: "Effects"
+            label: "Blur"
+            desc: "Blur what is behind translucent windows"
+            control: Setting.Switch
+            defaultValue: true
         },
-        {
-            section: "Effects",
-            key: "decoration.blur.size",
-            label: "Blur size",
-            desc: "Radius of each blur pass",
-            control: "slider",
-            resettable: true,
-            min: 1,
-            max: 12,
-            step: 1,
-            def: 4,
-            when: {
-                key: "decoration.blur.enabled",
-                value: true
-            }
+        Setting {
+            key: "decoration.blur.size"
+            section: "Effects"
+            label: "Blur size"
+            desc: "Radius of each blur pass"
+            control: Setting.Slider
+            resettable: true
+            min: 1
+            max: 12
+            step: 1
+            defaultValue: 4
+            shown: root.value("decoration.blur.enabled") === true
         },
-        {
-            section: "Effects",
-            key: "decoration.blur.passes",
-            label: "Blur passes",
-            desc: "More passes look smoother and cost more GPU",
-            control: "slider",
-            resettable: true,
-            min: 1,
-            max: 4,
-            step: 1,
-            def: 2,
-            when: {
-                key: "decoration.blur.enabled",
-                value: true
-            }
+        Setting {
+            key: "decoration.blur.passes"
+            section: "Effects"
+            label: "Blur passes"
+            desc: "More passes look smoother and cost more GPU"
+            control: Setting.Slider
+            resettable: true
+            min: 1
+            max: 4
+            step: 1
+            defaultValue: 2
+            shown: root.value("decoration.blur.enabled") === true
         },
-        {
-            section: "Effects",
-            key: "decoration.shadow.enabled",
-            label: "Shadows",
-            desc: "Drop shadows under windows",
-            control: "switch",
-            def: true
+        Setting {
+            key: "decoration.shadow.enabled"
+            section: "Effects"
+            label: "Shadows"
+            desc: "Drop shadows under windows"
+            control: Setting.Switch
+            defaultValue: true
         },
-        {
-            section: "Effects",
-            key: "decoration.shadow.range",
-            label: "Shadow range",
-            desc: "How far the shadow spreads",
-            control: "slider",
-            resettable: true,
-            min: 0,
-            max: 50,
-            step: 1,
-            def: 20,
-            when: {
-                key: "decoration.shadow.enabled",
-                value: true
-            }
+        Setting {
+            key: "decoration.shadow.range"
+            section: "Effects"
+            label: "Shadow range"
+            desc: "How far the shadow spreads"
+            control: Setting.Slider
+            resettable: true
+            min: 0
+            max: 50
+            step: 1
+            defaultValue: 20
+            shown: root.value("decoration.shadow.enabled") === true
         },
-        {
-            section: "Input",
-            key: "input.follow_mouse",
-            label: "Focus follows mouse",
-            desc: "When hovering a window gives it keyboard focus",
-            control: "seg",
-            opts: [
+        Setting {
+            key: "input.follow_mouse"
+            section: "Input"
+            label: "Focus follows mouse"
+            desc: "When hovering a window gives it keyboard focus"
+            control: Setting.Segmented
+            options: [
                 {
                     value: 0,
                     label: "Off"
@@ -339,35 +318,35 @@ SettingsStore {
                     value: 3,
                     label: "Loose"
                 }
-            ],
-            def: 1
+            ]
+            defaultValue: 1
         },
-        {
-            section: "Input",
-            key: "input.sensitivity",
-            label: "Pointer speed",
-            desc: "Added on top of the flat acceleration profile",
-            control: "slider",
-            resettable: true,
-            min: -1,
-            max: 1,
-            step: 0.05,
-            def: 0
+        Setting {
+            key: "input.sensitivity"
+            section: "Input"
+            label: "Pointer speed"
+            desc: "Added on top of the flat acceleration profile"
+            control: Setting.Slider
+            resettable: true
+            min: -1
+            max: 1
+            step: 0.05
+            defaultValue: 0
         },
-        {
-            section: "Input",
-            key: "input.touchpad.natural_scroll",
-            label: "Natural scrolling",
-            desc: "Touchpad content follows your fingers",
-            control: "switch",
-            def: false
+        Setting {
+            key: "input.touchpad.natural_scroll"
+            section: "Input"
+            label: "Natural scrolling"
+            desc: "Touchpad content follows your fingers"
+            control: Setting.Switch
+            defaultValue: false
         }
     ]
 
     function toLua(): string {
         let tree = {};
         for (let key in values) {
-            if (schema.find(row => row.key === key)?.hyprOption === false)
+            if (settings.find(setting => setting.key === key)?.hyprOption === false)
                 continue;
             let parts = key.split(".");
             let node = tree;

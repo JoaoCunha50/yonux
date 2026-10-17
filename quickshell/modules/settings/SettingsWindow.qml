@@ -281,16 +281,19 @@ FloatingWindow { // qmllint disable uncreatable-type
                     font.weight: Theme.font.title.weight
                 }
 
-                Repeater {
-                    model: ShellSettings.schema.filter(row => row.section === root.section)
-                    delegate: SettingRow {
-                        store: ShellSettings
-                    }
+                SettingRow {
+                    visible: root.section === "Theme"
+                    label: "Wallpaper"
+                    desc: "The colour palette is generated from it"
+                    control: wallpaperControl
                 }
 
                 Repeater {
-                    model: HyprSettings.schema.filter(row => row.section === root.section)
-                    delegate: SettingRow {}
+                    model: [...ShellSettings.inSection(root.section), ...HyprSettings.inSection(root.section)]
+                    delegate: SettingRow {
+                        required property Setting modelData
+                        setting: modelData
+                    }
                 }
 
                 BarEditor {
@@ -302,6 +305,35 @@ FloatingWindow { // qmllint disable uncreatable-type
                     Layout.fillWidth: true
                     visible: root.section === "About"
                 }
+            }
+        }
+    }
+
+    Component {
+        id: wallpaperControl
+
+        RowLayout {
+            spacing: Theme.spacing.md
+
+            UIText {
+                Layout.maximumWidth: 180
+                text: Wallpaper.path.split("/").pop()
+                muted: true
+                elide: Text.ElideMiddle
+            }
+
+            ShellButton {
+                implicitHeight: 34
+                text: "Choose…"
+                onClicked: wallpaperPicker.open()
+            }
+
+            FileDialog {
+                id: wallpaperPicker
+                title: "Choose a wallpaper"
+                currentFolder: Wallpaper.path !== "" ? `file://${Wallpaper.path.slice(0, Wallpaper.path.lastIndexOf("/"))}` : `file://${Quickshell.env("HOME")}/Pictures`
+                nameFilters: ["Images (*.png *.jpg *.jpeg *.webp)"]
+                onAccepted: Wallpaper.set(decodeURIComponent(selectedFile.toString().replace("file://", "")))
             }
         }
     }
