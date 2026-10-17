@@ -3,14 +3,17 @@
 # low-latency path. `stop` runs `hyprctl reload`, which rereads the Lua config
 # and drops every override made here, so there is nothing to remember.
 #
-#   game-mode [start | stop | toggle | status]   (status: exit 0 = on)
+#   game-mode [start | stop | toggle | status] [--quiet]   (status: exit 0 = on)
 #
 # The vibrance shader stays on on purpose.
 set -u
 
 state_file="${XDG_RUNTIME_DIR:-/tmp}/yonux-game-mode"
+quiet=false
+[[ ${2:-} == --quiet ]] && quiet=true
 
 notify() {
+  $quiet && return
   if command -v notify-send >/dev/null 2>&1; then
     notify-send -a yonux "Game mode" "$1"
   else

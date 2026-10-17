@@ -15,6 +15,7 @@ Rectangle {
     required property var modelData
     property var store: HyprSettings
     readonly property var row: modelData
+    readonly property var options: typeof row.opts === "function" ? row.opts() : (row.opts ?? [])
     readonly property var current: root.store.value(row.key)
     readonly property bool modified: root.store.modified(row.key)
     readonly property bool resettable: row.resettable ?? false
@@ -124,7 +125,7 @@ Rectangle {
             spacing: Theme.spacing.xs
 
             Repeater {
-                model: root.row.opts
+                model: root.options
 
                 delegate: Rectangle {
                     id: option
@@ -211,9 +212,9 @@ Rectangle {
 
         StyledSelect {
             implicitWidth: 220
-            model: root.row.opts.map(opt => opt.label)
-            currentIndex: root.row.opts.findIndex(opt => opt.value === root.current)
-            onActivated: index => root.store.set(root.row.key, root.row.opts[index].value)
+            model: root.options.map(opt => opt.label)
+            currentIndex: root.options.findIndex(opt => opt.value === root.current)
+            onActivated: index => root.store.set(root.row.key, root.options[index].value)
         }
     }
 

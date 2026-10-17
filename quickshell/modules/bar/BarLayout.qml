@@ -36,7 +36,7 @@ Singleton {
         defaults: ({
                 left: ["workspaces", "separator"],
                 center: ["clock"],
-                right: ["tray", "cpu", "memory", "disk", "temperature", "battery", "network", "audio", "power"]
+                right: ["tray", "cpu", "memory", "disk", "temperature", "battery", "network", "audio", "notifications", "power"]
             })
     }
 }

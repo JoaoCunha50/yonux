@@ -17,7 +17,78 @@ SettingsStore {
     onReadyChanged: if (ready)
         writeLua.restart()
 
+    readonly property string cursorTheme: ready ? value("cursor.theme") : ""
+    readonly property int cursorSize: ready ? Math.max(16, Math.min(64, Math.round(value("cursor.size")))) : 22
+    readonly property var cursorEnvironment: ({
+            XCURSOR_THEME: cursorTheme,
+            XCURSOR_SIZE: String(cursorSize),
+            HYPRCURSOR_THEME: cursorTheme,
+            HYPRCURSOR_SIZE: String(cursorSize)
+        })
+    property var installedCursorThemes: []
+    signal cursorApplied
+
+    readonly property var cursorOptions: {
+        let names = installedCursorThemes.slice();
+        for (let name of [defaults["cursor.theme"], cursorTheme])
+            if (name && !names.includes(name))
+                names.push(name);
+        return names.sort().map(name => ({
+                    value: name,
+                    label: name
+                }));
+    }
+
+    onCursorThemeChanged: cursorCommit.restart()
+    onCursorSizeChanged: cursorCommit.restart()
+
+    Timer {
+        id: cursorCommit
+        interval: 0
+        onTriggered: root.applyCursor()
+    }
+
+    Process {
+        id: cursorDiscovery
+        running: true
+        command: ["sh", "-c", `
+            for base in "$@"; do
+                for theme in "$base"/*; do
+                    [ -d "$theme/cursors" ] && printf '%s\\n' "\${theme##*/}"
+                done
+            done
+            exit 0
+        `, "yonux-cursors", Quickshell.env("HOME") + "/.icons", (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/icons", "/usr/share/icons", "/usr/local/share/icons", Quickshell.env("HOME") + "/.nix-profile/share/icons", "/run/current-system/sw/share/icons"]
+        stdout: StdioCollector {
+            onStreamFinished: root.installedCursorThemes = [...new Set(this.text.split("\n").filter(name => name.length > 0))].sort()
+        }
+    }
+
     schema: [
+        {
+            section: "Theme",
+            key: "cursor.theme",
+            label: "Cursor theme",
+            desc: "Applies to Hyprland; GTK apps need a matching XCursor theme",
+            control: "select",
+            resettable: true,
+            hyprOption: false,
+            opts: () => root.cursorOptions,
+            def: "Bibata-Modern-Ice"
+        },
+        {
+            section: "Theme",
+            key: "cursor.size",
+            label: "Cursor size",
+            desc: "Base size in pixels; monitor scaling also affects the result",
+            control: "slider",
+            resettable: true,
+            hyprOption: false,
+            min: 16,
+            max: 64,
+            step: 1,
+            def: 22
+        },
         {
             section: "Theme",
             key: "animations.enabled",
@@ -320,9 +391,45 @@ yonux = yonux or {}
 yonux.layout = ${JSON.stringify(value("general.layout"))}
 yonux.animation_speed = ${value("animations.speed")}
 
+hl.env("XCURSOR_THEME", ${literal(cursorTheme, 0)})
+hl.env("XCURSOR_SIZE", "${cursorSize}")
+hl.env("HYPRCURSOR_THEME", ${literal(cursorTheme, 0)})
+hl.env("HYPRCURSOR_SIZE", "${cursorSize}")
+
 hl.config(${literal(tree, 0)})
 if yonux.apply_animations then yonux.apply_animations() end
 `;
+    }
+
+    function applyCursor(): void {
+        if (!ready || !cursorTheme || cursorApply.running)
+            return;
+
+        cursorApply.theme = cursorTheme;
+        cursorApply.size = cursorSize;
+        cursorApply.environment = cursorEnvironment;
+        cursorApply.command = ["sh", "-c", `
+            hyprctl setcursor "$XCURSOR_THEME" "$XCURSOR_SIZE" &&
+            dbus-update-activation-environment --systemd XCURSOR_THEME XCURSOR_SIZE HYPRCURSOR_THEME HYPRCURSOR_SIZE
+        `];
+        cursorApply.running = true;
+    }
+
+    Process {
+        id: cursorApply
+        property string theme: ""
+        property int size: 22
+        stderr: StdioCollector {
+            id: cursorError
+        }
+        onExited: code => {
+            if (code !== 0)
+                Alerts.error("Could not apply the cursor settings", cursorError.text.trim() || "Exit code: " + code);
+            else
+                root.cursorApplied();
+            if (theme !== root.cursorTheme || size !== root.cursorSize)
+                cursorCommit.restart();
+        }
     }
 
     Timer {

@@ -80,5 +80,12 @@
   programs.gamescope.enable = true;
   programs.gamemode.enable = true;
 
-  programs.steam.extraPackages = [ pkgs.bibata-cursors ];
+  programs.steam = {
+    extraPackages = [ pkgs.bibata-cursors ];
+    package = pkgs.steam.override {
+      extraProfile = ''
+        export XCURSOR_PATH="${pkgs.adwaita-icon-theme}/share/icons:${pkgs.bibata-cursors}/share/icons''${XCURSOR_PATH:+:$XCURSOR_PATH}"
+      '';
+    };
+  };
 }

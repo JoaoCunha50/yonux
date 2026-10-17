@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import Quickshell
 import qs.theme
 import qs.components
+import qs.config
 
 Overlay {
     id: root
@@ -59,11 +60,11 @@ Overlay {
 
     function launch(entry: DesktopEntry): void {
         root.close();
-        if (entry.runInTerminal) {
-            Quickshell.execDetached(["xdg-terminal-exec"].concat(entry.command));
-        } else {
-            entry.execute();
-        }
+        Quickshell.execDetached({
+            command: entry.runInTerminal ? ["xdg-terminal-exec"].concat(entry.command) : entry.command,
+            workingDirectory: entry.workingDirectory,
+            environment: HyprSettings.cursorEnvironment
+        });
     }
 
     KeyboardNavigation {

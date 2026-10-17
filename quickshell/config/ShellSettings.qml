@@ -1,8 +1,8 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import qs.theme
 import qs.config
+import qs.theme
 
 SettingsStore {
     id: root

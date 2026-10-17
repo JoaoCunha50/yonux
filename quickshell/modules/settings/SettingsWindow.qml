@@ -50,6 +50,43 @@ FloatingWindow { // qmllint disable uncreatable-type
     visible: false
     color: Theme.colors.bg
 
+    MouseArea {
+        id: cursorRefresh
+        anchors.fill: parent
+        z: 1000
+        visible: cursorFrames.running
+        hoverEnabled: true
+        acceptedButtons: Qt.NoButton
+
+        // Hyprland 0.56 caches cursor images by shape across theme changes.
+        // Send distinct shapes, then restore the hovered control's cursor.
+        function refresh(): void {
+            cursorShape = Qt.ArrowCursor;
+            cursorFrames.step = 0;
+            cursorFrames.running = true;
+        }
+
+        FrameAnimation {
+            id: cursorFrames
+            property int step: 0
+            onTriggered: {
+                if (step++ === 0) {
+                    cursorRefresh.cursorShape = Qt.PointingHandCursor;
+                } else {
+                    running = false;
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: HyprSettings
+        function onCursorApplied(): void {
+            if (root.visible)
+                cursorRefresh.refresh();
+        }
+    }
+
     onSectionChanged: if (section === "About")
         SystemInfo.refresh()
 
@@ -90,7 +127,6 @@ FloatingWindow { // qmllint disable uncreatable-type
         }
     }
 
-    // Super+Q closes the window behind our back; keep `visible` in sync so the shortcut reopens it
     onClosed: visible = false
 
     FileDialog {
@@ -105,6 +141,13 @@ FloatingWindow { // qmllint disable uncreatable-type
         appid: "yonux"
         name: "settings"
         onPressed: root.visible = !root.visible
+    }
+
+    Connections {
+        target: OverlayManager
+        function onSettingsRequested(): void {
+            root.visible = true;
+        }
     }
 
     RowLayout {

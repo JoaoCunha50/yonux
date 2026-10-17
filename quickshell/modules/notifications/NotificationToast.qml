@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Services.Notifications
 import qs.components
 import qs.config
@@ -16,7 +15,7 @@ Item {
     readonly property bool critical: notification.urgency === NotificationUrgency.Critical
     readonly property bool shown: Notifications.isPopup(notification)
     readonly property var buttons: notification.actions.filter(action => action.identifier !== "default")
-    readonly property string iconSource: source(notification.image) || source(notification.appIcon)
+    readonly property string iconSource: Notifications.iconSource(notification.image) || Notifications.iconSource(notification.appIcon)
     property var pending: null
 
     implicitHeight: shown ? surface.height + Theme.spacing.sm : 0
@@ -29,18 +28,6 @@ Item {
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Motion.standard
         }
-    }
-
-    function source(icon: string): string {
-        if (!icon)
-            return "";
-        if (icon.startsWith("/"))
-            return "file://" + icon;
-        if (icon.startsWith("image://icon/"))
-            return source(icon.slice(13).split("?")[0]);
-        if (icon.includes("://"))
-            return icon;
-        return Quickshell.iconPath(icon, true) ?? "";
     }
 
     function closeThen(callback: var): void {
@@ -156,7 +143,7 @@ Item {
                             implicitHeight: 22
                             icon.name: Icons.close
                             icon.size: 16
-                            onClicked: root.closeThen(() => root.notification.dismiss())
+                            onClicked: Notifications.hidePopup(root.notification)
                         }
                     }
 
