@@ -49,15 +49,6 @@ Overlay {
         return extra.includes(query) ? 3 : -1;
     }
 
-    // Resolves absolute paths, theme names, or falls back to empty string
-    function iconSource(icon: string): string {
-        if (!icon)
-            return "";
-        if (icon.startsWith("/"))
-            return "file://" + icon;
-        return Quickshell.iconPath(icon, true) ?? "";
-    }
-
     function launch(entry: DesktopEntry): void {
         root.close();
         Quickshell.execDetached({
@@ -157,28 +148,12 @@ Overlay {
                 contentItem: RowLayout {
                     spacing: 14
 
-                    Item {
+                    ShellImage {
                         Layout.preferredWidth: 24
                         Layout.preferredHeight: 24
                         Layout.alignment: Qt.AlignVCenter
-
-                        Image {
-                            id: appIcon
-                            anchors.centerIn: parent
-                            width: 24
-                            height: 24
-                            fillMode: Image.PreserveAspectFit
-                            source: root.iconSource(delegateRoot.modelData.icon)
-                            asynchronous: true
-
-                            // Graceful fallback when an icon is absent or not yet indexed by Qt
-                            ShellIcon {
-                                anchors.centerIn: parent
-                                visible: appIcon.status !== Image.Ready
-                                icon.name: Icons.apps
-                                icon.size: 20
-                            }
-                        }
+                        source: delegateRoot.modelData.icon
+                        fallbackIcon.name: Icons.apps
                     }
 
                     UIText {

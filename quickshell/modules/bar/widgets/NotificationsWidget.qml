@@ -19,7 +19,7 @@ TrayItem {
         width: 7
         height: 7
         radius: width / 2
-        visible: Notifications.unread && !Notifications.panelOpen
+        visible: Notifications.unread && !Notifications.viewing
         color: Theme.colors.active
         border.color: Theme.colors.bg
         border.width: 1

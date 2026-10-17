@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Widgets
 import qs.theme
 import qs.config
 import qs.services
@@ -173,32 +172,18 @@ FloatingWindow { // qmllint disable uncreatable-type
                     Layout.bottomMargin: Theme.spacing.lg
                     spacing: Theme.spacing.xs
 
-                    ClippingRectangle {
+                    ShellImage {
                         id: avatar
                         Layout.alignment: Qt.AlignHCenter
                         Layout.bottomMargin: Theme.spacing.sm
                         implicitWidth: 72
                         implicitHeight: 72
-                        radius: avatar.width / 2
+                        circle: true
                         color: Theme.colors.field
-
-                        ShellIcon {
-                            anchors.centerIn: parent
-                            visible: face.status !== Image.Ready
-                            icon.name: Icons.person
-                            icon.size: 40
-                            icon.color: Theme.colors.fgMuted
-                        }
-
-                        Image {
-                            id: face
-                            anchors.fill: parent
-                            source: root.visible ? UserInfo.face : ""
-                            sourceSize: Qt.size(144, 144)
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
-                            cache: false
-                        }
+                        source: root.visible ? UserInfo.face : ""
+                        fillMode: Image.PreserveAspectCrop
+                        cache: false
+                        fallbackIcon.name: Icons.person
 
                         Rectangle {
                             anchors.fill: parent

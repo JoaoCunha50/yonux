@@ -21,15 +21,17 @@ Rectangle {
     readonly property bool resettable: row.resettable ?? false
 
     property bool editing: false
-    property bool revealed: modified
+    property bool revealed: false
 
-    onModifiedChanged: if (!editing)
+    Component.onCompleted: revealed = modified
+
+    onModifiedChanged: if (!editing && !revealDelay.running)
         revealed = modified
     onEditingChanged: editing ? revealDelay.stop() : revealDelay.restart()
 
     Timer {
         id: revealDelay
-        interval: Motion.small
+        interval: 200
         onTriggered: root.revealed = root.modified
     }
 
@@ -170,7 +172,12 @@ Rectangle {
                 stepSize: root.row.step
                 snapMode: T.Slider.SnapAlways
                 onMoved: commit.restart()
-                onPressedChanged: root.editing = pressed || commit.running
+
+                Binding {
+                    target: root
+                    property: "editing"
+                    value: control.pressed || commit.running
+                }
 
                 Layout.preferredWidth: 220
 
@@ -183,10 +190,7 @@ Rectangle {
                 Timer {
                     id: commit
                     interval: 200
-                    onTriggered: {
-                        root.store.set(root.row.key, Number(control.value.toFixed(4)));
-                        root.editing = control.pressed;
-                    }
+                    onTriggered: root.store.set(root.row.key, Number(control.value.toFixed(4)))
                 }
             }
 
