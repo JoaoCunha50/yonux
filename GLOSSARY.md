@@ -1,6 +1,6 @@
 # Glossary
 
-**Overlay**: a modal, full-screen layer-shell surface that takes exclusive keyboard focus and closes on Esc or on a click outside its surface (the launcher and the power menu). Only one Overlay is open at a time, tracked by `OverlayManager.current`. Each Overlay is opened by the Hyprland global shortcut `yonux:<name>`. _Not_ an Overlay: the lock screen (a session lock, not a layer surface) and notification toasts (non-modal).
+**Overlay**: a modal, full-screen layer-shell surface that takes exclusive keyboard focus and closes on Esc or on a click outside its surface: centred (the launcher and the power menu) or docked to the right edge (the Control center). Only one Overlay is open at a time, tracked by `OverlayManager.current`. Each Overlay is opened by the Hyprland global shortcut `yonux:<name>`. _Not_ an Overlay: the lock screen (a session lock, not a layer surface) and notification toasts (non-modal).
 
 **Bar**: the top panel shown on every screen.
 

@@ -9,7 +9,7 @@ Overlay {
     id: root
 
     name: "controlcenter"
-    docked: true
+    placement: Overlay.Right
 
     property real now: Date.now()
     property var expandedApps: ({})

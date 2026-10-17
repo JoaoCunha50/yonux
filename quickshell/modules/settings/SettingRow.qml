@@ -86,28 +86,12 @@ Rectangle {
             id: reset
 
             Layout.alignment: Qt.AlignVCenter
-            Layout.preferredWidth: shown ? resetButton.implicitWidth : 0
-            Layout.leftMargin: shown ? 0 : -content.spacing
+            Layout.preferredWidth: resetButton.implicitWidth * progress
+            Layout.leftMargin: -content.spacing * (1 - progress)
 
             implicitHeight: resetButton.implicitHeight
             visible: root.resettable
             shown: root.revealed
-
-            Behavior on Layout.preferredWidth {
-                NumberAnimation {
-                    duration: Motion.small
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.standard
-                }
-            }
-
-            Behavior on Layout.leftMargin {
-                NumberAnimation {
-                    duration: Motion.small
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.standard
-                }
-            }
 
             IconButton {
                 id: resetButton

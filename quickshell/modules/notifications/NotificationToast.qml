@@ -49,13 +49,6 @@ Item {
         keepContent();
         leaving = true;
         ListView.delayRemove = true;
-        removal.start();
-    }
-
-    Timer {
-        id: removal
-        interval: Math.max(Motion.exit, Motion.small)
-        onTriggered: root.ListView.delayRemove = false
     }
 
     Timer {
@@ -68,6 +61,8 @@ Item {
         width: parent.width
         height: surface.height
         shown: root.shown
+        onHidden: if (root.leaving)
+            root.ListView.delayRemove = false
 
         Rectangle {
             id: surface

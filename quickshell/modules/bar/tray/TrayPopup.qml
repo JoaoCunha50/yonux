@@ -24,23 +24,16 @@ PopupWindow {
     anchor.rect.width: anchorItem ? anchorItem.width : 0
     anchor.rect.height: anchorItem ? anchorItem.height + _offset : 0
 
-    onOpenChanged: {
-        if (!open)
-            return;
-        if (anchorItem)
-            _offset = Theme.bar.height - anchorItem.mapToItem(null, 0, 0).y - anchorItem.height + gap;
-        visible = true;
-    }
-
     onVisibleChanged: if (!visible)
         open = false
 
     Reveal {
         anchors.fill: parent
         shown: root.open
+        window: root
         transformOrigin: Item.Top
-        onActiveChanged: if (!active)
-            root.visible = false
+        onAboutToShow: if (root.anchorItem)
+            root._offset = Theme.bar.height - root.anchorItem.mapToItem(null, 0, 0).y - root.anchorItem.height + root.gap
 
         Rectangle {
             anchors.fill: parent
