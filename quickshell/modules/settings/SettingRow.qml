@@ -85,11 +85,11 @@ Rectangle {
             visible: root.resettable
             shown: root.revealed
 
-            IconButton {
+            ShellButton {
+                type: ShellButton.Ghost
                 id: resetButton
                 anchors.centerIn: parent
                 icon.name: Icons.reset
-                tooltip: "Reset to default"
                 enabled: root.modified
                 onClicked: root.setting.reset()
             }

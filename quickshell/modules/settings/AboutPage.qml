@@ -155,41 +155,6 @@ ColumnLayout {
         }
     }
 
-    component Action: Rectangle {
-        id: action
-
-        property string icon: ""
-        property string text: ""
-        signal clicked
-
-        implicitWidth: actionRow.implicitWidth + Theme.spacing.lg * 2
-        implicitHeight: 36
-        radius: Theme.radius.sm
-        color: actionArea.pressed ? Theme.colors.controlPressedFill : actionArea.containsMouse ? Theme.colors.controlHoverFill : Theme.colors.controlNormalFill
-
-        RowLayout {
-            id: actionRow
-            anchors.centerIn: parent
-            spacing: Theme.spacing.sm
-
-            ShellIcon {
-                icon.name: action.icon
-            }
-
-            UIText {
-                text: action.text
-            }
-        }
-
-        MouseArea {
-            id: actionArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: action.clicked()
-        }
-    }
-
     RowLayout {
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
@@ -398,9 +363,11 @@ ColumnLayout {
     RowLayout {
         spacing: Theme.spacing.sm
 
-        Action {
+        ShellButton {
             id: copyAction
-            icon: Icons.copy
+            implicitHeight: 36
+            iconFirst: true
+            icon.name: Icons.copy
             text: copiedTimer.running ? "Copied" : "Copy system info"
             onClicked: {
                 Quickshell.clipboardText = SystemInfo.asText();
@@ -413,9 +380,11 @@ ColumnLayout {
             }
         }
 
-        Action {
+        ShellButton {
             visible: SystemInfo.repoUrl !== ""
-            icon: Icons.openExternal
+            implicitHeight: 36
+            iconFirst: true
+            icon.name: Icons.openExternal
             text: "Open repository"
             onClicked: Qt.openUrlExternally(SystemInfo.repoUrl)
         }

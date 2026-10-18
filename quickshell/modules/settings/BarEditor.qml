@@ -8,7 +8,7 @@ import qs.modules.bar
 RowLayout {
     id: root
 
-    readonly property var available: Object.keys(BarModel.items).filter(id => !BarLayout.used.includes(id)).sort()
+    readonly property var available: BarModel.widgets.filter(widget => !BarLayout.used.includes(widget.key)).sort((a, b) => a.label.localeCompare(b.label))
 
     spacing: Theme.spacing.md
 
@@ -60,29 +60,40 @@ RowLayout {
 
                         required property string modelData
                         required property int index
+                        readonly property var widget: BarModel.find(modelData)
 
                         Layout.fillWidth: true
                         spacing: 2
 
+                        ShellIcon {
+                            icon.name: entry.widget?.icon ?? Icons.info
+                            icon.size: 16
+                            icon.color: Theme.colors.fgMuted
+                        }
+
                         UIText {
                             Layout.fillWidth: true
-                            text: entry.modelData
+                            Layout.leftMargin: Theme.spacing.xs
+                            text: entry.widget?.label ?? entry.modelData
                             elide: Text.ElideRight
                         }
 
-                        IconButton {
+                        ShellButton {
+                            type: ShellButton.Ghost
                             icon.name: Icons.arrowUp
                             enabled: entry.index > 0
                             onClicked: BarLayout.move(column.modelData.key, entry.index, -1)
                         }
 
-                        IconButton {
+                        ShellButton {
+                            type: ShellButton.Ghost
                             icon.name: Icons.arrowDown
                             enabled: entry.index < column.ids.length - 1
                             onClicked: BarLayout.move(column.modelData.key, entry.index, 1)
                         }
 
-                        IconButton {
+                        ShellButton {
+                            type: ShellButton.Ghost
                             icon.name: Icons.close
                             onClicked: BarLayout.remove(column.modelData.key, entry.index)
                         }
@@ -98,12 +109,14 @@ RowLayout {
                     StyledSelect {
                         id: picker
                         Layout.fillWidth: true
-                        model: root.available
+                        model: root.available.map(widget => widget.label)
                     }
 
-                    IconButton {
+                    ShellButton {
+                        type: ShellButton.Ghost
                         icon.name: Icons.add
-                        onClicked: BarLayout.add(column.modelData.key, picker.currentText)
+                        enabled: picker.currentIndex >= 0
+                        onClicked: BarLayout.add(column.modelData.key, root.available[picker.currentIndex].key)
                     }
                 }
             }

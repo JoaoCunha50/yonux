@@ -33,7 +33,8 @@ ColumnLayout {
             muted: true
         }
 
-        IconButton {
+        ShellButton {
+            type: ShellButton.Ghost
             visible: root.entries.length > 1
             implicitWidth: 22
             implicitHeight: 22
@@ -49,7 +50,8 @@ ColumnLayout {
             }
         }
 
-        IconButton {
+        ShellButton {
+            type: ShellButton.Ghost
             implicitWidth: 22
             implicitHeight: 22
             icon.name: Icons.close

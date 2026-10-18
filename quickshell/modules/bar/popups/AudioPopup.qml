@@ -46,16 +46,16 @@ TrayPopup {
                     elide: Text.ElideRight
                 }
 
-                IconButton {
+                ShellButton {
+                    type: ShellButton.Ghost
                     icon.name: row.modelData.isSink ? (row.muted ? Icons.volumeOff : Icons.volumeUp) : (row.muted ? Icons.micOff : Icons.mic)
-                    tooltip: row.modelData.isSink ? "Toggle output" : "Toggle microphone"
                     enabled: !!row.modelData.audio
                     onClicked: Audio.toggleMute(row.modelData)
                 }
 
-                IconButton {
+                ShellButton {
+                    type: ShellButton.Ghost
                     icon.name: Icons.check
-                    tooltip: row.modelData.isSink ? "Select output" : "Select microphone"
                     active: row.selected
                     enabled: !row.selected
                     onClicked: Audio.select(row.modelData)

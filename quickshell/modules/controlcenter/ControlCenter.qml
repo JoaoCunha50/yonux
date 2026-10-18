@@ -74,7 +74,8 @@ Overlay {
                 }
             }
 
-            IconButton {
+            ShellButton {
+                type: ShellButton.Ghost
                 icon.name: Icons.settings
                 onClicked: {
                     OverlayManager.close();
@@ -82,7 +83,8 @@ Overlay {
                 }
             }
 
-            IconButton {
+            ShellButton {
+                type: ShellButton.Ghost
                 icon.name: Icons.power
                 onClicked: OverlayManager.open("power")
             }
@@ -127,7 +129,8 @@ Overlay {
             Layout.fillWidth: true
             spacing: Theme.spacing.sm
 
-            IconButton {
+            ShellButton {
+                type: ShellButton.Ghost
                 icon.name: Audio.muted ? Icons.volumeOff : Audio.volume < 0.5 ? Icons.volumeDown : Icons.volumeUp
                 enabled: Audio.defaultOutput !== null
                 onClicked: Audio.toggleMute(Audio.defaultOutput)
@@ -169,7 +172,7 @@ Overlay {
 
             ShellButton {
                 visible: Notifications.history.length > 0
-                muted: true
+                type: ShellButton.Muted
                 text: "Clear all"
                 icon.name: Icons.clearAll
                 onClicked: Notifications.clear()
