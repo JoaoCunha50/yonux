@@ -18,7 +18,6 @@ hl.config({
         rounding_power = 2,
         active_opacity = 1,
         inactive_opacity = 1,
-        screen_shader = paths.hypr .. "/shaders/vibrance.glsl",
         shadow = {
             enabled = true,
             range = 20,
