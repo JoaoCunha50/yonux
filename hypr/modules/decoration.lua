@@ -44,6 +44,6 @@ end
 
 hl.layer_rule({
     name = "yonux-shell-noanim",
-    match = { namespace = "^quickshell$" },
+    match = { namespace = "^(quickshell|yonux-.*)$" },
     no_anim = true,
 })

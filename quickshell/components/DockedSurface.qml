@@ -12,10 +12,10 @@ Item {
 
     ConcaveCorner {}
 
-    ConcaveCorner {
+    /*     ConcaveCorner {
         anchors.bottom: parent.bottom
-        atBottom: true
-    }
+        atBottom: false
+    } */
 
     Rectangle {
         id: panel

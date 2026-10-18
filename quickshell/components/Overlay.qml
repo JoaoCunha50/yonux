@@ -28,7 +28,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
     WlrLayershell.namespace: `yonux-${name}`
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     exclusiveZone: 0
 
     anchors {
@@ -52,6 +52,31 @@ PanelWindow { // qmllint disable uncreatable-type
     function focusedScreen(): var {
         let monitor = Hyprland.focusedMonitor;
         return Quickshell.screens.find(screen => screen.name === monitor?.name) ?? Quickshell.screens[0] ?? null;
+    }
+
+    Variants {
+        model: root.open ? Quickshell.screens.filter(screen => screen !== root.screen) : []
+
+        PanelWindow { // qmllint disable uncreatable-type
+            required property ShellScreen modelData
+
+            screen: modelData
+            WlrLayershell.namespace: `yonux-${root.name}-outside`
+            WlrLayershell.layer: WlrLayer.Overlay
+            exclusiveZone: 0
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
+            color: "transparent"
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: root.close()
+            }
+        }
     }
 
     GlobalShortcut { // qmllint disable unresolved-type
@@ -136,6 +161,7 @@ PanelWindow { // qmllint disable uncreatable-type
                 reveal.hiddenOffset: 0
                 reveal.hiddenOffsetX: reveal.width
                 reveal.hiddenOpacity: 1
+                reveal.overshoot: false
 
                 card.visible: false
                 docked.visible: true
