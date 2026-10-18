@@ -2,34 +2,39 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtQuick.Dialogs
-import Quickshell
 import qs.theme
 import qs.config
-import qs.services
 import qs.components
 
 Rectangle {
     id: root
 
-    required property var modelData
-    property var store: HyprSettings
-    readonly property var row: modelData
-    readonly property var options: typeof row.opts === "function" ? row.opts() : (row.opts ?? [])
-    readonly property var current: root.store.value(row.key)
-    readonly property bool modified: root.store.modified(row.key)
-    readonly property bool resettable: row.resettable ?? false
+    property Setting setting: null
+    property string label: setting?.label ?? ""
+    property string desc: setting?.desc ?? ""
+    property Component control: setting ? controls[setting.control] : null
+
+    readonly property var controls: ({
+            [Setting.Switch]: toggle,
+            [Setting.Slider]: slider,
+            [Setting.Segmented]: segmented,
+            [Setting.Select]: select
+        })
+    readonly property bool modified: setting?.modified ?? false
+    readonly property bool resettable: setting?.resettable ?? false
 
     property bool editing: false
-    property bool revealed: modified
+    property bool revealed: false
 
-    onModifiedChanged: if (!editing)
+    Component.onCompleted: revealed = modified
+
+    onModifiedChanged: if (!editing && !revealDelay.running)
         revealed = modified
     onEditingChanged: editing ? revealDelay.stop() : revealDelay.restart()
 
     Timer {
         id: revealDelay
-        interval: Motion.small
+        interval: 200
         onTriggered: root.revealed = root.modified
     }
 
@@ -39,13 +44,7 @@ Rectangle {
     radius: Theme.radius.md
     color: Theme.colors.controlNormalFill
 
-    visible: root.store.shown(row)
-
-    function format(value: real): string {
-        if (row.percent)
-            return `${Math.round(value * 100)}%`;
-        return row.step < 1 ? value.toFixed(2) : `${Math.round(value)}`;
-    }
+    visible: setting?.shown ?? true
 
     RowLayout {
         id: content
@@ -58,12 +57,12 @@ Rectangle {
             spacing: 2
 
             UIText {
-                text: root.row.label
+                text: root.label
             }
 
             UIText {
                 Layout.fillWidth: true
-                text: root.row.desc
+                text: root.desc
                 muted: true
                 font.pixelSize: Theme.font.body.small
                 wrapMode: Text.WordWrap
@@ -72,40 +71,19 @@ Rectangle {
 
         Loader {
             Layout.alignment: Qt.AlignVCenter
-            sourceComponent: ({
-                    seg: segmented,
-                    slider: slider,
-                    select: select,
-                    wallpaper: wallpaper
-                })[root.row.control] ?? toggle
+            sourceComponent: root.control
         }
 
         Reveal {
             id: reset
 
             Layout.alignment: Qt.AlignVCenter
-            Layout.preferredWidth: shown ? resetButton.implicitWidth : 0
-            Layout.leftMargin: shown ? 0 : -content.spacing
+            Layout.preferredWidth: resetButton.implicitWidth * progress
+            Layout.leftMargin: -content.spacing * (1 - progress)
 
             implicitHeight: resetButton.implicitHeight
             visible: root.resettable
             shown: root.revealed
-
-            Behavior on Layout.preferredWidth {
-                NumberAnimation {
-                    duration: Motion.small
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.standard
-                }
-            }
-
-            Behavior on Layout.leftMargin {
-                NumberAnimation {
-                    duration: Motion.small
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.standard
-                }
-            }
 
             IconButton {
                 id: resetButton
@@ -113,7 +91,7 @@ Rectangle {
                 icon.name: Icons.reset
                 tooltip: "Reset to default"
                 enabled: root.modified
-                onClicked: root.store.reset(root.row.key)
+                onClicked: root.setting.reset()
             }
         }
     }
@@ -125,13 +103,13 @@ Rectangle {
             spacing: Theme.spacing.xs
 
             Repeater {
-                model: root.options
+                model: root.setting.options
 
                 delegate: Rectangle {
                     id: option
 
                     required property var modelData
-                    readonly property bool selected: root.current === modelData.value
+                    readonly property bool selected: root.setting.value === modelData.value
 
                     implicitWidth: label.implicitWidth + Theme.spacing.lg * 2
                     implicitHeight: 32
@@ -150,7 +128,7 @@ Rectangle {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: root.store.set(root.row.key, option.modelData.value)
+                        onClicked: root.setting.set(option.modelData.value)
                     }
                 }
             }
@@ -165,35 +143,30 @@ Rectangle {
 
             StyledSlider {
                 id: control
-                from: root.row.min
-                to: root.row.max
-                stepSize: root.row.step
-                snapMode: T.Slider.SnapAlways
-                onMoved: commit.restart()
-                onPressedChanged: root.editing = pressed || commit.running
-
                 Layout.preferredWidth: 220
+                from: root.setting.min
+                to: root.setting.max
+                stepSize: root.setting.step
+                snapMode: T.Slider.SnapAlways
+                onMoved: root.setting.adjust(value)
 
-                Binding on value {
-                    value: root.current
-                    when: !control.pressed && !commit.running
-                    restoreMode: Binding.RestoreNone
+                Binding {
+                    target: root
+                    property: "editing"
+                    value: control.pressed || root.setting.adjusting
                 }
 
-                Timer {
-                    id: commit
-                    interval: 200
-                    onTriggered: {
-                        root.store.set(root.row.key, Number(control.value.toFixed(4)));
-                        root.editing = control.pressed;
-                    }
+                Binding on value {
+                    value: root.setting.value
+                    when: !control.pressed && !root.setting.adjusting
+                    restoreMode: Binding.RestoreNone
                 }
             }
 
             UIText {
                 Layout.preferredWidth: 40
                 horizontalAlignment: Text.AlignRight
-                text: root.format(control.value)
+                text: root.setting.format(control.value)
             }
         }
     }
@@ -202,8 +175,8 @@ Rectangle {
         id: toggle
 
         StyledSwitch {
-            checked: root.current
-            onToggled: root.store.set(root.row.key, checked)
+            checked: root.setting.value
+            onToggled: root.setting.set(checked)
         }
     }
 
@@ -212,53 +185,9 @@ Rectangle {
 
         StyledSelect {
             implicitWidth: 220
-            model: root.options.map(opt => opt.label)
-            currentIndex: root.options.findIndex(opt => opt.value === root.current)
-            onActivated: index => root.store.set(root.row.key, root.options[index].value)
-        }
-    }
-
-    Component {
-        id: wallpaper
-
-        RowLayout {
-            spacing: Theme.spacing.md
-
-            UIText {
-                Layout.maximumWidth: 180
-                text: Wallpaper.path.split("/").pop()
-                muted: true
-                elide: Text.ElideMiddle
-            }
-
-            Rectangle {
-                implicitWidth: chooseLabel.implicitWidth + Theme.spacing.lg * 2
-                implicitHeight: 34
-                radius: Theme.radius.sm
-                color: chooseArea.pressed ? Theme.colors.controlPressedFill : chooseArea.containsMouse ? Theme.colors.controlHoverFill : Theme.colors.field
-
-                UIText {
-                    id: chooseLabel
-                    anchors.centerIn: parent
-                    text: "Choose…"
-                }
-
-                MouseArea {
-                    id: chooseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: picker.open()
-                }
-            }
-
-            FileDialog {
-                id: picker
-                title: "Choose a wallpaper"
-                currentFolder: Wallpaper.path !== "" ? `file://${Wallpaper.path.slice(0, Wallpaper.path.lastIndexOf("/"))}` : `file://${Quickshell.env("HOME")}/Pictures`
-                nameFilters: ["Images (*.png *.jpg *.jpeg *.webp)"]
-                onAccepted: Wallpaper.set(decodeURIComponent(selectedFile.toString().replace("file://", "")))
-            }
+            model: root.setting.options.map(option => option.label)
+            currentIndex: root.setting.options.findIndex(option => option.value === root.setting.value)
+            onActivated: index => root.setting.set(root.setting.options[index].value)
         }
     }
 }

@@ -5,22 +5,27 @@ import qs.config
 Singleton {
     id: root
 
-    required property string file
-    required property var schema
+    required property string path
+    property list<Setting> settings: []
 
-    readonly property string dir: config.dir
     readonly property var values: config.values
     readonly property bool ready: config.ready
 
     readonly property var defaults: {
         let result = {};
-        for (let row of schema)
-            if (row.def !== undefined)
-                result[row.key] = row.def;
+        for (let setting of settings)
+            if (setting.defaultValue !== undefined)
+                result[setting.key] = setting.defaultValue;
         return result;
     }
 
     signal edited(key: string)
+
+    onSettingsChanged: settings.forEach(setting => setting.store = root)
+
+    function inSection(section: string): var {
+        return settings.filter(setting => setting.section === section);
+    }
 
     function value(key: string): var {
         return config.value(key);
@@ -32,20 +37,17 @@ Singleton {
     }
 
     function reset(key: string): void {
-        set(key, JSON.parse(JSON.stringify(defaults[key])));
+        config.reset(key);
+        edited(key);
     }
 
     function modified(key: string): bool {
         return !config.isDefault(key);
     }
 
-    function shown(row: var): bool {
-        return !row.when || value(row.when.key) === row.when.value;
-    }
-
     JsonConfig {
         id: config
-        file: root.file
+        path: root.path
         defaults: root.defaults
     }
 }

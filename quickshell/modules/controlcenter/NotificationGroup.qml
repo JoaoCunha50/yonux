@@ -15,6 +15,7 @@ ColumnLayout {
     readonly property int hidden: expanded ? 0 : entries.length - 1
 
     signal toggled
+    signal actionTaken
 
     spacing: Theme.spacing.xs
 
@@ -65,6 +66,7 @@ ColumnLayout {
             Layout.fillWidth: true
             entry: modelData
             now: root.now
+            onActionTaken: root.actionTaken()
         }
     }
 

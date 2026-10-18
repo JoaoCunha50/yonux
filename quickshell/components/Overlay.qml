@@ -1,6 +1,5 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
@@ -10,11 +9,16 @@ import qs.components
 PanelWindow { // qmllint disable uncreatable-type
     id: root
 
+    enum Placement {
+        Center,
+        Right
+    }
+
     required property string name
+    property int placement: Overlay.Center
     property bool dim: false
     property int padding: Theme.overlay.padding
-    property bool docked: false
-    property int dockedWidth: 400
+    property int panelWidth: 400
     readonly property bool open: OverlayManager.current === name
 
     default property alias content: body.data
@@ -37,13 +41,8 @@ PanelWindow { // qmllint disable uncreatable-type
     color: "transparent"
     visible: false
 
-    onOpenChanged: {
-        if (!open)
-            return;
-        screen = focusedScreen();
-        visible = true;
-        opened();
-    }
+    onVisibleChanged: if (visible)
+        opened()
 
     function close(): void {
         if (open)
@@ -76,96 +75,73 @@ PanelWindow { // qmllint disable uncreatable-type
     Reveal {
         id: reveal
 
-        readonly property int corner: root.docked ? Theme.radius.xl : 0
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        width: card.width
+        height: card.height
 
-        anchors.centerIn: root.docked ? undefined : parent
-        anchors.top: root.docked ? parent.top : undefined
-        anchors.right: root.docked ? parent.right : undefined
-        anchors.bottom: root.docked ? parent.bottom : undefined
-
-        width: surface.width + corner
-        height: root.docked ? undefined : surface.height
         shown: root.open
-        hiddenScale: root.docked ? 1 : Motion.revealScale
-        hiddenOffset: root.docked ? 0 : Motion.revealOffset
-        hiddenOffsetX: root.docked ? width : 0
-        hiddenOpacity: root.docked ? 1 : 0
+        window: root
 
         Keys.onEscapePressed: root.close()
-
-        onActiveChanged: {
-            if (active)
-                return;
-            root.visible = false;
-            root.hidden();
-        }
-
-        ConcaveCorner {
-            visible: root.docked
-        }
-
-        ConcaveCorner {
-            visible: root.docked
-            anchors.bottom: parent.bottom
-            atBottom: true
-        }
+        onAboutToShow: root.screen = root.focusedScreen()
+        onHidden: root.hidden()
 
         Rectangle {
-            id: surface
-            anchors.right: parent.right
-            width: root.docked ? root.dockedWidth : body.childrenRect.width + root.padding * 2
-            height: root.docked ? reveal.height : body.childrenRect.height + root.padding * 2
-
-            color: root.docked ? Theme.colors.bg : Theme.colors.surface
-            radius: root.docked ? 0 : Theme.radius.xl
+            id: card
+            width: body.childrenRect.width + root.padding * 2
+            height: body.childrenRect.height + root.padding * 2
+            color: Theme.colors.surface
+            radius: Theme.radius.xl
             border.color: Theme.colors.border
-            border.width: root.docked ? 0 : 1
-
-            MouseArea {
-                anchors.fill: parent
-                preventStealing: true
-            }
-
-            Item {
-                id: body
-                x: root.padding
-                y: root.padding
-                width: root.docked ? surface.width - root.padding * 2 : childrenRect.width
-                height: root.docked ? surface.height - root.padding * 2 : childrenRect.height
-            }
+            border.width: 1
         }
-    }
 
-    component ConcaveCorner: Shape {
-        id: corner
+        DockedSurface {
+            id: docked
+            anchors.fill: parent
+            visible: false
+        }
 
-        property bool atBottom: false
-        readonly property real extent: reveal.corner
+        MouseArea {
+            anchors.fill: body
+            anchors.margins: -root.padding
+            preventStealing: true
+        }
 
-        width: extent
-        height: extent
-        preferredRendererType: Shape.CurveRenderer
+        Item {
+            id: body
+            x: root.padding
+            y: root.padding
+            width: childrenRect.width
+            height: childrenRect.height
+        }
 
-        ShapePath {
-            strokeWidth: -1
-            fillColor: Theme.colors.bg
-            startX: corner.extent
-            startY: corner.atBottom ? 0 : corner.extent
+        states: State {
+            name: "right"
+            when: root.placement === Overlay.Right
 
-            PathLine {
-                x: corner.extent
-                y: corner.atBottom ? corner.extent : 0
+            AnchorChanges {
+                target: reveal
+                anchors.horizontalCenter: undefined
+                anchors.verticalCenter: undefined
+                anchors.top: reveal.parent.top
+                anchors.right: reveal.parent.right
+                anchors.bottom: reveal.parent.bottom
             }
-            PathLine {
-                x: 0
-                y: corner.atBottom ? corner.extent : 0
-            }
-            PathArc {
-                x: corner.extent
-                y: corner.atBottom ? 0 : corner.extent
-                radiusX: corner.extent
-                radiusY: corner.extent
-                direction: corner.atBottom ? PathArc.Counterclockwise : PathArc.Clockwise
+
+            PropertyChanges {
+                reveal.width: root.panelWidth + docked.corner
+                reveal.hiddenScale: 1
+                reveal.hiddenOffset: 0
+                reveal.hiddenOffsetX: reveal.width
+                reveal.hiddenOpacity: 1
+
+                card.visible: false
+                docked.visible: true
+                body.x: docked.corner + root.padding
+                body.width: root.panelWidth - root.padding * 2
+                body.height: reveal.height - root.padding * 2
             }
         }
     }

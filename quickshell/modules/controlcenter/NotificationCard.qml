@@ -11,10 +11,10 @@ Rectangle {
 
     required property var entry
     required property real now
-    readonly property bool live: entry.notification !== null
     readonly property bool fresh: entry.time > Notifications.lastSeen
-    readonly property var buttons: live ? entry.notification.actions.filter(action => action.identifier !== "default") : []
-    readonly property bool clickable: live && Notifications.defaultAction(entry.notification) !== null
+    readonly property bool clickable: entry.defaultAction !== null
+
+    signal actionTaken
 
     implicitHeight: content.implicitHeight + Theme.spacing.md * 2
     radius: Theme.radius.lg
@@ -43,7 +43,10 @@ Rectangle {
         anchors.fill: parent
         enabled: root.clickable
         cursorShape: Qt.PointingHandCursor
-        onClicked: Notifications.activate(root.entry)
+        onClicked: {
+            root.entry.activate();
+            root.actionTaken();
+        }
     }
 
     RowLayout {
@@ -52,27 +55,14 @@ Rectangle {
         anchors.margins: Theme.spacing.md
         spacing: Theme.spacing.md
 
-        Item {
+        ShellImage {
             Layout.alignment: Qt.AlignTop
             implicitWidth: 40
             implicitHeight: 40
-
-            Image {
-                id: picture
-                anchors.fill: parent
-                source: Notifications.iconSource(root.entry.image) || Notifications.iconSource(root.entry.appIcon)
-                sourceSize: Qt.size(80, 80)
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-            }
-
-            ShellIcon {
-                anchors.centerIn: parent
-                visible: picture.status !== Image.Ready
-                icon.name: Icons.notifications
-                icon.size: 24
-                icon.color: root.entry.critical ? Theme.colors.alert : Theme.colors.fgMuted
-            }
+            source: root.entry.icon
+            fillMode: Image.PreserveAspectCrop
+            fallbackIcon.name: Icons.notifications
+            fallbackIcon.color: root.entry.critical ? Theme.colors.alert : Theme.colors.fgMuted
         }
 
         ColumnLayout {
@@ -102,7 +92,7 @@ Rectangle {
                     implicitHeight: 22
                     icon.name: Icons.close
                     icon.size: 16
-                    onClicked: Notifications.dismiss(root.entry)
+                    onClicked: root.entry.dismiss()
                 }
             }
 
@@ -121,11 +111,11 @@ Rectangle {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.topMargin: Theme.spacing.sm
-                visible: root.buttons.length > 0
+                visible: root.entry.actions.length > 0
                 spacing: Theme.spacing.sm
 
                 Repeater {
-                    model: root.buttons
+                    model: root.entry.actions
 
                     Rectangle {
                         id: button
@@ -150,8 +140,8 @@ Rectangle {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                OverlayManager.close();
-                                button.modelData.invoke();
+                                root.entry.invoke(button.modelData);
+                                root.actionTaken();
                             }
                         }
                     }

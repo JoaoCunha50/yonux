@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Widgets
 import qs.theme
 import qs.config
 import qs.services
@@ -173,32 +172,18 @@ FloatingWindow { // qmllint disable uncreatable-type
                     Layout.bottomMargin: Theme.spacing.lg
                     spacing: Theme.spacing.xs
 
-                    ClippingRectangle {
+                    ShellImage {
                         id: avatar
                         Layout.alignment: Qt.AlignHCenter
                         Layout.bottomMargin: Theme.spacing.sm
                         implicitWidth: 72
                         implicitHeight: 72
-                        radius: avatar.width / 2
+                        circle: true
                         color: Theme.colors.field
-
-                        ShellIcon {
-                            anchors.centerIn: parent
-                            visible: face.status !== Image.Ready
-                            icon.name: Icons.person
-                            icon.size: 40
-                            icon.color: Theme.colors.fgMuted
-                        }
-
-                        Image {
-                            id: face
-                            anchors.fill: parent
-                            source: root.visible ? UserInfo.face : ""
-                            sourceSize: Qt.size(144, 144)
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
-                            cache: false
-                        }
+                        source: root.visible ? UserInfo.face : ""
+                        fillMode: Image.PreserveAspectCrop
+                        cache: false
+                        fallbackIcon.name: Icons.person
 
                         Rectangle {
                             anchors.fill: parent
@@ -296,16 +281,19 @@ FloatingWindow { // qmllint disable uncreatable-type
                     font.weight: Theme.font.title.weight
                 }
 
-                Repeater {
-                    model: ShellSettings.schema.filter(row => row.section === root.section)
-                    delegate: SettingRow {
-                        store: ShellSettings
-                    }
+                SettingRow {
+                    visible: root.section === "Theme"
+                    label: "Wallpaper"
+                    desc: "The colour palette is generated from it"
+                    control: wallpaperControl
                 }
 
                 Repeater {
-                    model: HyprSettings.schema.filter(row => row.section === root.section)
-                    delegate: SettingRow {}
+                    model: [...ShellSettings.inSection(root.section), ...HyprSettings.inSection(root.section)]
+                    delegate: SettingRow {
+                        required property Setting modelData
+                        setting: modelData
+                    }
                 }
 
                 BarEditor {
@@ -317,6 +305,35 @@ FloatingWindow { // qmllint disable uncreatable-type
                     Layout.fillWidth: true
                     visible: root.section === "About"
                 }
+            }
+        }
+    }
+
+    Component {
+        id: wallpaperControl
+
+        RowLayout {
+            spacing: Theme.spacing.md
+
+            UIText {
+                Layout.maximumWidth: 180
+                text: Wallpaper.path.split("/").pop()
+                muted: true
+                elide: Text.ElideMiddle
+            }
+
+            ShellButton {
+                implicitHeight: 34
+                text: "Choose…"
+                onClicked: wallpaperPicker.open()
+            }
+
+            FileDialog {
+                id: wallpaperPicker
+                title: "Choose a wallpaper"
+                currentFolder: Wallpaper.path !== "" ? `file://${Wallpaper.path.slice(0, Wallpaper.path.lastIndexOf("/"))}` : `file://${Quickshell.env("HOME")}/Pictures`
+                nameFilters: ["Images (*.png *.jpg *.jpeg *.webp)"]
+                onAccepted: Wallpaper.set(decodeURIComponent(selectedFile.toString().replace("file://", "")))
             }
         }
     }

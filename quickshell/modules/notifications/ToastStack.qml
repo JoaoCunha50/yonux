@@ -13,7 +13,7 @@ PanelWindow { // qmllint disable uncreatable-type
     readonly property int gap: HyprSettings.value("general.gaps_out")
 
     screen: Quickshell.screens.find(screen => screen.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0] ?? null
-    visible: Notifications.popupIds.length > 0 || column.height > 0
+    visible: Notifications.toasts.length > 0 || list.contentHeight > 0
 
     WlrLayershell.namespace: "yonux-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -31,20 +31,21 @@ PanelWindow { // qmllint disable uncreatable-type
 
     implicitWidth: 380
     mask: Region {
-        item: column
+        item: list
     }
     color: "transparent"
 
-    Column {
-        id: column
+    ListView {
+        id: list
         width: parent.width
+        height: contentHeight
+        interactive: false
+        model: ScriptModel {
+            values: Notifications.toasts
+        }
 
-        Repeater {
-            model: Notifications.model
-
-            NotificationToast {
-                width: column.width
-            }
+        delegate: NotificationToast {
+            width: ListView.view.width
         }
     }
 }

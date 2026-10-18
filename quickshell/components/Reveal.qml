@@ -5,6 +5,7 @@ Item {
     id: root
 
     property bool shown: false
+    property QtObject window: null
     property real hiddenScale: Motion.revealScale
     property real hiddenOffset: Motion.revealOffset
     property real hiddenOffsetX: 0
@@ -12,11 +13,30 @@ Item {
     property real progress: shown ? 1 : 0
     readonly property bool active: shown || progress > 0
 
+    signal aboutToShow
+    signal hidden
+
     opacity: hiddenOpacity + (1 - hiddenOpacity) * progress
     scale: hiddenScale + (1 - hiddenScale) * progress
     transform: Translate {
         x: root.hiddenOffsetX * (1 - root.progress)
         y: root.hiddenOffset * (1 - root.progress)
+    }
+
+    onShownChanged: {
+        if (!shown)
+            return;
+        aboutToShow();
+        if (window)
+            window.visible = true;
+    }
+
+    onActiveChanged: {
+        if (active)
+            return;
+        if (window)
+            window.visible = false;
+        hidden();
     }
 
     Behavior on progress {

@@ -7,7 +7,7 @@ import qs.theme
 SettingsStore {
     id: root
 
-    file: "shell.json"
+    path: `${Paths.config}/shell.json`
 
     // Only on explicit changes, so a fresh install never overrides GTK fonts the user picked elsewhere
     onEdited: key => {
@@ -15,22 +15,15 @@ SettingsStore {
             applyGtkFont();
     }
 
-    schema: [
-        {
-            section: "Theme",
-            key: "wallpaper",
-            label: "Wallpaper",
-            desc: "The colour palette is generated from it",
-            control: "wallpaper"
-        },
-        {
-            section: "Theme",
-            key: "theme.scheme",
-            label: "Color scheme",
-            desc: "How matugen turns the wallpaper into a palette",
-            control: "select",
-            resettable: true,
-            opts: [
+    settings: [
+        Setting {
+            key: "theme.scheme"
+            section: "Theme"
+            label: "Color scheme"
+            desc: "How matugen turns the wallpaper into a palette"
+            control: Setting.Select
+            resettable: true
+            options: [
                 {
                     value: "scheme-tonal-spot",
                     label: "Tonal spot"
@@ -71,58 +64,58 @@ SettingsStore {
                     value: "scheme-smart",
                     label: "Smart"
                 }
-            ],
-            def: "scheme-tonal-spot"
+            ]
+            defaultValue: "scheme-tonal-spot"
         },
-        {
-            section: "Theme",
-            key: "font.scale",
-            label: "Font size",
-            desc: "Scales every text size in the shell and GTK apps",
-            control: "slider",
-            resettable: true,
-            min: 0.8,
-            max: 1.5,
-            step: 0.05,
-            percent: true,
-            def: 1
+        Setting {
+            key: "font.scale"
+            section: "Theme"
+            label: "Font size"
+            desc: "Scales every text size in the shell and GTK apps"
+            control: Setting.Slider
+            resettable: true
+            min: 0.8
+            max: 1.5
+            step: 0.05
+            percent: true
+            defaultValue: 1
         },
-        {
-            section: "Theme",
-            key: "theme.radius",
-            label: "Shell corners",
-            desc: "Roundness of the bar, popups and controls",
-            control: "slider",
-            resettable: true,
-            min: 0,
-            max: 2,
-            step: 0.05,
-            percent: true,
-            def: 1
+        Setting {
+            key: "theme.radius"
+            section: "Theme"
+            label: "Shell corners"
+            desc: "Roundness of the bar, popups and controls"
+            control: Setting.Slider
+            resettable: true
+            min: 0
+            max: 2
+            step: 0.05
+            percent: true
+            defaultValue: 1
         },
-        {
-            section: "Bar",
-            key: "bar.height",
-            label: "Bar height",
-            desc: "Text and icons keep their size",
-            control: "slider",
-            resettable: true,
-            min: 32,
-            max: 56,
-            step: 1,
-            def: 40
+        Setting {
+            key: "bar.height"
+            section: "Bar"
+            label: "Bar height"
+            desc: "Text and icons keep their size"
+            control: Setting.Slider
+            resettable: true
+            min: 32
+            max: 56
+            step: 1
+            defaultValue: 40
         },
-        {
-            section: "Notifications",
-            key: "notifications.timeout",
-            label: "Notification timeout",
-            desc: "Seconds a notification stays on screen unless the app sets its own. Critical ones stay until closed",
-            control: "slider",
-            resettable: true,
-            min: 2,
-            max: 15,
-            step: 1,
-            def: 5
+        Setting {
+            key: "notifications.timeout"
+            section: "Notifications"
+            label: "Notification timeout"
+            desc: "Seconds a notification stays on screen unless the app sets its own. Critical ones stay until closed"
+            control: Setting.Slider
+            resettable: true
+            min: 2
+            max: 15
+            step: 1
+            defaultValue: 5
         }
     ]
 

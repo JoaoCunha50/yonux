@@ -12,7 +12,7 @@ Singleton {
     readonly property HyprlandWorkspace workspace: special ? Hyprland.workspaces.values.find(ws => ws.name === special) ?? null : monitor?.activeWorkspace ?? null
 
     readonly property string special: monitor?.lastIpcObject.specialWorkspace?.name ?? ""
-    readonly property bool fullscreen: workspace?.toplevels.values.some(toplevel => toplevel.lastIpcObject.fullscreen > 1) ?? false
+    readonly property bool fullscreen: workspace?.toplevels.values.some(toplevel => toplevel.lastIpcObject?.fullscreen > 1) === true
 
     signal settingsRequested
 

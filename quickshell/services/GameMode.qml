@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
 
 Singleton {
     id: root
@@ -10,12 +11,11 @@ Singleton {
     property bool ready: false
 
     function toggle(): void {
-        let config = Quickshell.env("XDG_CONFIG_HOME") || `${Quickshell.env("HOME")}/.config`;
-        Quickshell.execDetached([`${config}/hypr/scripts/game-mode`, "toggle", "--quiet"]);
+        Quickshell.execDetached([`${Paths.hypr}/scripts/game-mode`, "toggle", "--quiet"]);
     }
 
     FileView {
-        path: `${Quickshell.env("XDG_RUNTIME_DIR") || "/tmp"}/yonux-game-mode`
+        path: `${Paths.runtime}/yonux-game-mode`
         watchChanges: true
         printErrors: false
 

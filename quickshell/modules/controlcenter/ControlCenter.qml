@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Widgets
 import qs.components
 import qs.services
 import qs.theme
@@ -10,10 +9,16 @@ Overlay {
     id: root
 
     name: "controlcenter"
-    docked: true
+    placement: Overlay.Right
 
     property real now: Date.now()
     property var expandedApps: ({})
+
+    Binding {
+        target: Notifications
+        property: "viewing"
+        value: root.open
+    }
 
     onOpened: {
         now = Date.now();
@@ -38,29 +43,15 @@ Overlay {
             Layout.fillWidth: true
             spacing: Theme.spacing.md
 
-            ClippingRectangle {
+            ShellImage {
                 implicitWidth: 44
                 implicitHeight: 44
-                radius: 22
+                circle: true
                 color: Theme.colors.field
-
-                ShellIcon {
-                    anchors.centerIn: parent
-                    visible: face.status !== Image.Ready
-                    icon.name: Icons.person
-                    icon.size: 24
-                    icon.color: Theme.colors.fgMuted
-                }
-
-                Image {
-                    id: face
-                    anchors.fill: parent
-                    source: root.open ? UserInfo.face : ""
-                    sourceSize: Qt.size(88, 88)
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    cache: false
-                }
+                source: root.open ? UserInfo.face : ""
+                fillMode: Image.PreserveAspectCrop
+                cache: false
+                fallbackIcon.name: Icons.person
             }
 
             ColumnLayout {
@@ -201,6 +192,7 @@ Overlay {
                 entries: modelData.entries
                 now: root.now
                 expanded: root.expandedApps[appName] === true
+                onActionTaken: root.close()
                 onToggled: {
                     let next = Object.assign({}, root.expandedApps);
                     next[appName] = !expanded;

@@ -2,17 +2,24 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
 import qs.services
 
 Singleton {
     id: root
 
-    readonly property string stateFile: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/current_wallpaper"
+    readonly property string stateFile: `${Paths.state}/wallpaper`
+    readonly property string legacyStateFile: `${Paths.stateHome}/current_wallpaper`
     property string path: ""
 
     function set(path: string): void {
         validator.candidate = path;
         validator.running = true;
+    }
+
+    Process {
+        running: true
+        command: ["sh", "-c", "[ -f \"$1\" ] && [ ! -f \"$2\" ] && mkdir -p \"${2%/*}\" && mv \"$1\" \"$2\"; exit 0", "sh", root.legacyStateFile, root.stateFile]
     }
 
     FileView {
