@@ -74,7 +74,8 @@ Overlay {
                 }
             }
 
-            IconButton {
+            ShellButton {
+                type: ShellButton.Ghost
                 icon.name: Icons.settings
                 onClicked: {
                     OverlayManager.close();
@@ -82,7 +83,8 @@ Overlay {
                 }
             }
 
-            IconButton {
+            ShellButton {
+                type: ShellButton.Ghost
                 icon.name: Icons.power
                 onClicked: OverlayManager.open("power")
             }
@@ -96,7 +98,7 @@ Overlay {
 
             QuickTile {
                 Layout.fillWidth: true
-                Layout.columnSpan: 2
+                Layout.columnSpan: 1
                 icon: Network.wifiEnabled ? Icons.wifi : Icons.wifiOff
                 label: "Wi-Fi"
                 detail: Network.wifiEnabled ? (Network.wifiNetwork?.name ?? "Not connected") : "Off"
@@ -121,13 +123,24 @@ Overlay {
                 active: GameMode.active
                 onClicked: GameMode.toggle()
             }
+
+            QuickTile {
+                Layout.fillWidth: true
+                Layout.columnSpan: 1
+                icon: Icons.nightLight
+                label: "Night light"
+                detail: NightLight.active ? "On" : "Off"
+                active: NightLight.active
+                onClicked: NightLight.toggle()
+            }
         }
 
         RowLayout {
             Layout.fillWidth: true
             spacing: Theme.spacing.sm
 
-            IconButton {
+            ShellButton {
+                type: ShellButton.Ghost
                 icon.name: Audio.muted ? Icons.volumeOff : Audio.volume < 0.5 ? Icons.volumeDown : Icons.volumeUp
                 enabled: Audio.defaultOutput !== null
                 onClicked: Audio.toggleMute(Audio.defaultOutput)
@@ -169,7 +182,7 @@ Overlay {
 
             ShellButton {
                 visible: Notifications.history.length > 0
-                muted: true
+                type: ShellButton.Muted
                 text: "Clear all"
                 icon.name: Icons.clearAll
                 onClicked: Notifications.clear()

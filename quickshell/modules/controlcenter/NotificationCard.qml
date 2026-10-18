@@ -28,14 +28,17 @@ Rectangle {
             return "now";
         if (minutes < 60)
             return `${minutes} min`;
+
         let hours = Math.floor(minutes / 60);
         if (hours < 24)
             return `${hours} h`;
+
         let date = new Date(time);
         let yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         if (date.toDateString() === yesterday.toDateString())
             return "yesterday";
+
         return Qt.formatDate(date, "d MMM");
     }
 
@@ -87,7 +90,8 @@ Rectangle {
                     muted: true
                 }
 
-                IconButton {
+                ShellButton {
+                    type: ShellButton.Ghost
                     implicitWidth: 22
                     implicitHeight: 22
                     icon.name: Icons.close
@@ -117,32 +121,16 @@ Rectangle {
                 Repeater {
                     model: root.entry.actions
 
-                    Rectangle {
+                    ShellButton {
                         id: button
                         required property NotificationAction modelData
 
                         Layout.fillWidth: true
-                        implicitHeight: 30
-                        radius: Theme.radius.sm
-                        color: buttonArea.pressed ? Theme.colors.controlPressedFill : buttonArea.containsMouse ? Theme.colors.controlHoverFill : Theme.colors.surface
-
-                        UIText {
-                            anchors.centerIn: parent
-                            width: parent.width - Theme.spacing.md * 2
-                            horizontalAlignment: Text.AlignHCenter
-                            elide: Text.ElideRight
-                            text: button.modelData.text
-                        }
-
-                        MouseArea {
-                            id: buttonArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                root.entry.invoke(button.modelData);
-                                root.actionTaken();
-                            }
+                        type: ShellButton.Tonal
+                        text: modelData.text
+                        onClicked: {
+                            root.entry.invoke(button.modelData);
+                            root.actionTaken();
                         }
                     }
                 }

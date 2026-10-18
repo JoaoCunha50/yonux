@@ -1,15 +1,11 @@
 pragma Singleton
+pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Services.SystemTray
 import qs.theme
 import qs.services
-import qs.components
 import qs.modules.bar
-import qs.modules.bar.tray
 import qs.modules.bar.widgets
-import qs.modules.bar.systray
 
 Singleton {
     id: root
@@ -18,145 +14,138 @@ Singleton {
     readonly property list<Component> center: resolve(BarLayout.center)
     readonly property list<Component> right: resolve(BarLayout.right)
 
-    readonly property var items: ({
-            workspaces: workspaces,
-            tray: tray,
-            separator: separator,
-            title: title,
-            clock: clock,
-            audio: audio,
-            network: network,
-            cpu: cpu,
-            memory: memory,
-            disk: disk,
-            temperature: temperature,
-            battery: battery,
-            notifications: notifications,
-            power: power
-        })
-
-    function resolve(ids: var): var {
-        return ids.filter(id => {
-            if (items[id])
-                return true;
-            Alerts.error("bar.json has an unknown item", id);
-            return false;
-        }).map(id => items[id]);
+    function find(key: string): BarWidget {
+        return widgets.find(widget => widget.key === key) ?? null;
     }
 
-    Component {
-        id: workspaces
-        WorkspacesWidget {}
+    function resolve(keys: var): var {
+        return keys.map(key => {
+            let widget = find(key);
+            if (!widget)
+                Alerts.error("bar.json has an unknown item", key);
+            return widget?.component;
+        }).filter(component => component);
     }
 
-    Component {
-        id: tray
-        TrayItem {
-            shown: SystemTray.items.values.length > 0
-
-            contentItem: SysTray {}
-        }
+    component BarWidget: QtObject {
+        required property string key
+        required property string label
+        required property string icon
+        required property Component component
     }
 
-    Component {
-        id: separator
-        TrayItem {
-            contentItem: Rectangle {
-                implicitWidth: 2
-                implicitHeight: 18
-                color: Theme.colors.active
+    property list<BarWidget> widgets: [
+        BarWidget {
+            key: "workspaces"
+            label: "Workspaces"
+            icon: Icons.workspaces
+            component: Component {
+                WorkspacesWidget {}
+            }
+        },
+        BarWidget {
+            key: "title"
+            label: "Window title"
+            icon: Icons.windows
+            component: Component {
+                TitleWidget {}
+            }
+        },
+        BarWidget {
+            key: "clock"
+            label: "Clock"
+            icon: Icons.clock
+            component: Component {
+                ClockWidget {}
+            }
+        },
+        BarWidget {
+            key: "tray"
+            label: "System tray"
+            icon: Icons.tray
+            component: Component {
+                TrayWidget {}
+            }
+        },
+        BarWidget {
+            key: "separator"
+            label: "Separator"
+            icon: Icons.separator
+            component: Component {
+                SeparatorWidget {}
+            }
+        },
+        BarWidget {
+            key: "cpu"
+            label: "CPU"
+            icon: Icons.cpu
+            component: Component {
+                CpuWidget {}
+            }
+        },
+        BarWidget {
+            key: "memory"
+            label: "Memory"
+            icon: Icons.memory
+            component: Component {
+                MemoryWidget {}
+            }
+        },
+        BarWidget {
+            key: "disk"
+            label: "Disk"
+            icon: Icons.disk
+            component: Component {
+                DiskWidget {}
+            }
+        },
+        BarWidget {
+            key: "temperature"
+            label: "Temperature"
+            icon: Icons.temperature
+            component: Component {
+                TemperatureWidget {}
+            }
+        },
+        BarWidget {
+            key: "battery"
+            label: "Battery"
+            icon: Icons.batteryFull
+            component: Component {
+                BatteryWidget {}
+            }
+        },
+        BarWidget {
+            key: "network"
+            label: "Network"
+            icon: Icons.wifi
+            component: Component {
+                NetworkWidget {}
+            }
+        },
+        BarWidget {
+            key: "audio"
+            label: "Volume"
+            icon: Icons.volumeUp
+            component: Component {
+                AudioWidget {}
+            }
+        },
+        BarWidget {
+            key: "notifications"
+            label: "Notifications"
+            icon: Icons.notifications
+            component: Component {
+                NotificationsWidget {}
+            }
+        },
+        BarWidget {
+            key: "power"
+            label: "Power"
+            icon: Icons.power
+            component: Component {
+                PowerWidget {}
             }
         }
-    }
-
-    Component {
-        id: title
-        TrayItem {
-            fillWidth: true
-
-            contentItem: UIText {
-                verticalAlignment: Text.AlignVCenter
-                elide: Text.ElideRight
-                padding: 5
-                font.pixelSize: Theme.font.body.small
-                text: Hyprland.activeToplevel?.title ?? `Workspace ${Hyprland.focusedWorkspace?.name ?? "?"}`
-            }
-        }
-    }
-
-    Component {
-        id: clock
-        ClockWidget {}
-    }
-
-    Component {
-        id: audio
-        AudioWidget {}
-    }
-
-    Component {
-        id: network
-        NetworkWidget {}
-    }
-
-    Component {
-        id: cpu
-        TrayItem {
-            icon.name: Icons.cpu
-            text: `${SystemStats.cpuPercent}%`
-            alert: SystemStats.cpuPercent > 80
-            hoverText: `Load average: ${SystemStats.loadAverage}`
-        }
-    }
-
-    Component {
-        id: memory
-        TrayItem {
-            icon.name: Icons.memory
-            text: `${SystemStats.memoryPercent}%`
-            alert: SystemStats.memoryPercent > 85
-            hoverText: `${SystemStats.memoryUsedGiB.toFixed(1)} / ${SystemStats.memoryTotalGiB.toFixed(1)} GiB used`
-        }
-    }
-
-    Component {
-        id: disk
-        TrayItem {
-            icon.name: Icons.disk
-            text: `${SystemStats.diskPercent}%`
-            alert: SystemStats.diskPercent > 90
-            hoverText: `${SystemStats.diskUsedGiB.toFixed(0)} / ${SystemStats.diskTotalGiB.toFixed(0)} GiB used on /`
-        }
-    }
-
-    Component {
-        id: temperature
-        TrayItem {
-            shown: SystemStats.temperature >= 0
-            icon.name: Icons.temperature
-            text: `${SystemStats.temperature}°C`
-            alert: SystemStats.temperature > 80
-        }
-    }
-
-    Component {
-        id: battery
-        BatteryWidget {}
-    }
-
-    Component {
-        id: notifications
-        NotificationsWidget {}
-    }
-
-    Component {
-        id: power
-        TrayItem {
-            icon.name: Icons.power
-            icon.weight: 600
-            clickable: true
-            hoverText: "Power"
-            onClicked: OverlayManager.toggle("power")
-        }
-    }
+    ]
 }

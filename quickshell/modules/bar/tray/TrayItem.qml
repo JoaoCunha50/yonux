@@ -24,7 +24,8 @@ Item {
 
     readonly property bool hasLabel: icon.name !== "" || text !== ""
     readonly property alias popupOpen: anchor.popupOpen
-    readonly property color contentColor: popupOpen ? Theme.colors.onActive : alert ? Theme.colors.alert : Theme.colors.fg
+    property bool active: popupOpen
+    readonly property color contentColor: active ? Theme.colors.onActive : alert ? Theme.colors.alert : Theme.colors.fg
 
     signal clicked
 
@@ -48,7 +49,7 @@ Item {
         visible: root.clickable
         radius: Theme.radius.sm
         color: {
-            if (root.popupOpen)
+            if (root.active)
                 return Theme.colors.active;
             if (tapHandler.pressed)
                 return Theme.colors.controlPressedFill;

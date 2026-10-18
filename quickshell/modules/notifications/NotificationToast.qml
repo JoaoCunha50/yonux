@@ -115,7 +115,8 @@ Item {
                             elide: Text.ElideRight
                         }
 
-                        IconButton {
+                        ShellButton {
+                            type: ShellButton.Ghost
                             implicitWidth: 22
                             implicitHeight: 22
                             enabled: !root.leaving
@@ -154,30 +155,13 @@ Item {
                         Repeater {
                             model: root.actions
 
-                            Rectangle {
+                            ShellButton {
                                 id: button
                                 required property NotificationAction modelData
 
                                 Layout.fillWidth: true
-                                implicitHeight: 30
-                                radius: Theme.radius.sm
-                                color: buttonArea.pressed ? Theme.colors.controlPressedFill : buttonArea.containsMouse ? Theme.colors.controlHoverFill : Theme.colors.field
-
-                                UIText {
-                                    anchors.centerIn: parent
-                                    width: parent.width - Theme.spacing.md * 2
-                                    horizontalAlignment: Text.AlignHCenter
-                                    elide: Text.ElideRight
-                                    text: button.modelData.text
-                                }
-
-                                MouseArea {
-                                    id: buttonArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.entry.invoke(button.modelData)
-                                }
+                                text: modelData.text
+                                onClicked: root.entry.invoke(button.modelData)
                             }
                         }
                     }

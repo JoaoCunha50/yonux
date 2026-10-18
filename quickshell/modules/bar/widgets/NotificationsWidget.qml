@@ -9,6 +9,7 @@ TrayItem {
 
     icon.name: Notifications.dnd ? Icons.notificationsOff : Icons.notifications
     clickable: true
+    active: Notifications.viewing
     hoverText: Notifications.dnd ? "Do not disturb" : "Notifications"
     onClicked: OverlayManager.toggle("controlcenter")
 

@@ -4,7 +4,7 @@
 
 **Bar**: the top panel shown on every screen.
 
-**Bar widget**: one entry in the Bar (`modules/bar/widgets/`), identified by an id in `bar.json` (read by `BarLayout`) and resolved by `BarModel`. Built on `TrayItem`.
+**Bar widget**: one entry in the Bar (`modules/bar/widgets/`), registered in `BarModel` with a key, a label and an icon, and placed by its key in `bar.json` (read by `BarLayout`). Built on `TrayItem`.
 
 **Tray popup**: a non-modal popup anchored to a Bar widget, opened by clicking it. Distinct from an Overlay.
 
