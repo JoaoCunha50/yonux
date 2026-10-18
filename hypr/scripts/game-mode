@@ -5,7 +5,6 @@
 #
 #   game-mode [start | stop | toggle | status] [--quiet]   (status: exit 0 = on)
 #
-# The vibrance shader stays on on purpose.
 set -u
 
 state_file="${XDG_RUNTIME_DIR:-/tmp}/yonux-game-mode"
