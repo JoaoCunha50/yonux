@@ -39,7 +39,6 @@ Rectangle {
     }
 
     readonly property int padding: type === ShellButton.Muted ? Theme.spacing.sm : Theme.spacing.md
-    // Material Symbols glyphs carry empty space on both sides; drop it on the icon's side so the padding looks even
     readonly property int iconInset: iconItem.visible && !iconOnly ? Math.round(iconItem.icon.size / 12) : 0
 
     signal clicked
@@ -69,7 +68,7 @@ Rectangle {
         UIText {
             id: label
             anchors.verticalCenter: parent.verticalCenter
-            width: Math.min(implicitWidth, root.width - root.padding * 2 - (iconItem.visible ? iconItem.width + row.spacing : 0))
+            width: Math.min(implicitWidth, root.width - root.padding * 2 + root.iconInset - (iconItem.visible ? iconItem.width + row.spacing : 0))
             visible: text !== ""
             text: root.text
             elide: Text.ElideRight

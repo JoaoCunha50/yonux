@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -u
+
+state_file="${XDG_RUNTIME_DIR:-/tmp}/yonux-night-light"
+temperature="${2:-4000}"
+
+hyprsunset() {
+  local out
+  out=$(hyprctl hyprsunset "$@" 2>&1) || { echo "$out" >&2; exit 1; }
+}
+
+start() {
+  hyprsunset temperature "$temperature"
+  touch "$state_file"
+}
+
+stop() {
+  hyprsunset identity
+  rm -f "$state_file"
+}
+
+case "${1:-toggle}" in
+  status) [[ -f $state_file ]] ;;
+  start | on) start ;;
+  stop | off) stop ;;
+  toggle) if [[ -f $state_file ]]; then stop; else start; fi ;;
+  *)
+    echo "usage: night-light [start | stop | toggle | status] [temperature]" >&2
+    exit 1
+    ;;
+esac

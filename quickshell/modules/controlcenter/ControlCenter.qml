@@ -98,7 +98,7 @@ Overlay {
 
             QuickTile {
                 Layout.fillWidth: true
-                Layout.columnSpan: 2
+                Layout.columnSpan: 1
                 icon: Network.wifiEnabled ? Icons.wifi : Icons.wifiOff
                 label: "Wi-Fi"
                 detail: Network.wifiEnabled ? (Network.wifiNetwork?.name ?? "Not connected") : "Off"
@@ -122,6 +122,16 @@ Overlay {
                 label: "Game mode"
                 active: GameMode.active
                 onClicked: GameMode.toggle()
+            }
+
+            QuickTile {
+                Layout.fillWidth: true
+                Layout.columnSpan: 1
+                icon: Icons.nightLight
+                label: "Night light"
+                detail: NightLight.active ? "On" : "Off"
+                active: NightLight.active
+                onClicked: NightLight.toggle()
             }
         }
 

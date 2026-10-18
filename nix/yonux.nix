@@ -13,6 +13,7 @@
     nautilus
     hyprpicker
     hyprpolkitagent
+    hyprsunset
     bibata-cursors
     adw-gtk3
     adwaita-icon-theme

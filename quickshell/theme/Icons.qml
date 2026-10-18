@@ -39,6 +39,7 @@ QtObject {
     readonly property string notificationsOff: "notifications_off"
     readonly property string dnd: "do_not_disturb_on"
     readonly property string gameMode: "sports_esports"
+    readonly property string nightLight: "nightlight"
     readonly property string clearAll: "clear_all"
     readonly property string workspaces: "workspaces"
     readonly property string separator: "more_vert"
