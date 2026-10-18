@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.UPower
+import "CpuTemperature.js" as CpuTemperature
 
 Singleton {
     id: root
@@ -23,7 +24,6 @@ Singleton {
     readonly property int batteryState: battery?.state ?? UPowerDeviceState.Unknown
 
     property var _lastCpuTimes: null
-    property string _temperaturePath: ""
 
     Timer {
         interval: 5000
@@ -35,8 +35,7 @@ Singleton {
             loadFile.reload();
             memoryFile.reload();
             diskProcess.running = true;
-            if (root._temperaturePath !== "")
-                temperatureFile.reload();
+            temperatureProcess.running = true;
         }
     }
 
@@ -117,38 +116,17 @@ Singleton {
         }
     }
 
-    // Picks the CPU sensor once, preferring Package id 0 / Tdie over Tctl (same order as libsensors-based shells)
     Process {
-        running: true
-        command: ["sh", "-c", `
-            best=""; fallback=""; first=""
-            for h in /sys/class/hwmon/hwmon*; do
-                case "$(cat "$h/name" 2>/dev/null)" in coretemp|k10temp|zenpower) ;; *) continue ;; esac
-                [ -z "$first" ] && [ -r "$h/temp1_input" ] && first="$h/temp1_input"
-                for l in "$h"/temp*_label; do
-                    [ -r "$l" ] || continue
-                    case "$(cat "$l")" in
-                        "Package id 0"|Tdie) [ -z "$best" ] && best="\${l%_label}_input" ;;
-                        Tctl) [ -z "$fallback" ] && fallback="\${l%_label}_input" ;;
-                    esac
-                done
-            done
-            echo "\${best:-\${fallback:-$first}}"
-        `]
+        id: temperatureProcess
+        command: ["sensors", "-j"]
 
         stdout: StdioCollector {
-            onStreamFinished: root._temperaturePath = this.text.trim()
+            onStreamFinished: root.temperature = CpuTemperature.parse(text)
         }
-    }
 
-    FileView {
-        id: temperatureFile
-        path: root._temperaturePath
-
-        onLoaded: {
-            let milli = parseInt(text(), 10);
-            if (!isNaN(milli))
-                root.temperature = Math.round(milli / 1000);
+        onExited: code => {
+            if (code !== 0)
+                root.temperature = -1;
         }
     }
 }

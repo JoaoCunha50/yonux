@@ -12,6 +12,7 @@ Item {
 
     ConcaveCorner {}
 
+    // For the future bordered window (ContentWindow) implementation, where there will be a concave corner at the bottom of the window as well.
     /*     ConcaveCorner {
         anchors.bottom: parent.bottom
         atBottom: false
