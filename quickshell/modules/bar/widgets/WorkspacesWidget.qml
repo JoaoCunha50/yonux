@@ -21,11 +21,12 @@ TrayItem {
                 values: root.workspaces
             }
 
-            delegate: Rectangle {
+            delegate: ShellButton {
                 id: button
 
                 required property HyprlandWorkspace modelData
-                readonly property bool active: root.monitor?.activeWorkspace === modelData
+                active: root.monitor?.activeWorkspace === modelData
+                showDefaultContent: false
 
                 Layout.preferredWidth: 26
                 Layout.preferredHeight: 26
@@ -46,11 +47,7 @@ TrayItem {
                     color: button.active ? Theme.colors.active : Theme.colors.fg
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: button.modelData.activate()
-                }
+                onClicked: button.modelData.activate()
             }
         }
     }

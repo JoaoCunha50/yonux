@@ -10,9 +10,10 @@ import qs.modules.bar.tray
 TrayPopup {
     id: audioPopup
 
-    implicitWidth: 360
-    implicitHeight: 480
-    grabFocus: true
+    shadowPadding: 20
+    implicitWidth: 360 + shadowPadding * 2
+    implicitHeight: 480 + shadowPadding * 2
+    dismissOnClickOutside: true
 
     PwObjectTracker {
         objects: Audio.outputs.concat(Audio.inputs)

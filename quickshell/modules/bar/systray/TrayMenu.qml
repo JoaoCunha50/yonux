@@ -13,9 +13,12 @@ TrayPopup {
     property var stack: []
 
     padding: 6
-    implicitWidth: 240
-    implicitHeight: column.implicitHeight + padding * 2
-    grabFocus: true
+    shadowPadding: 12
+    shadowBlur: 8
+
+    implicitWidth: 240 + shadowPadding * 2
+    implicitHeight: column.implicitHeight + padding * 2 + shadowPadding * 2
+    dismissOnClickOutside: true
 
     onVisibleChanged: if (!visible)
         stack = []
@@ -25,12 +28,10 @@ TrayPopup {
         menu: root.stack.length > 0 ? root.stack[root.stack.length - 1] : root.handle
     }
 
-    component MenuRow: Rectangle {
+    component MenuRow: ShellButton {
         id: row
 
-        property string icon: ""
         property string image: ""
-        property string text: ""
         property string trailing: ""
         property bool interactive: true
 
@@ -38,9 +39,12 @@ TrayPopup {
 
         width: parent.width
         height: 30
+        showDefaultContent: false
+        clickable: interactive
         radius: Theme.radius.sm
-        color: interactive && area.containsMouse ? Theme.colors.controlHoverFill : "transparent"
+        color: interactive && hovered ? Theme.colors.controlHoverFill : "transparent"
         opacity: interactive ? 1 : 0.5
+        onClicked: row.activated()
 
         Item {
             id: leading
@@ -49,12 +53,12 @@ TrayPopup {
             anchors.verticalCenter: parent.verticalCenter
             width: 16
             height: 16
-            visible: row.icon !== "" || row.image !== ""
+            visible: row.icon.name !== "" || row.image !== ""
 
             ShellIcon {
                 anchors.centerIn: parent
                 visible: row.image === ""
-                icon.name: row.icon
+                icon: row.icon
             }
 
             IconImage {
@@ -85,14 +89,6 @@ TrayPopup {
             icon.name: row.trailing
         }
 
-        MouseArea {
-            id: area
-            anchors.fill: parent
-            enabled: row.interactive
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: row.activated()
-        }
     }
 
     Column {
@@ -102,7 +98,7 @@ TrayPopup {
 
         MenuRow {
             visible: root.stack.length > 0
-            icon: Icons.chevronLeft
+            icon.name: Icons.chevronLeft
             text: "Back"
             onActivated: root.stack = root.stack.slice(0, -1)
         }

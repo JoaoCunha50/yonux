@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import qs.components
 import qs.theme
 
 Item {
@@ -28,6 +29,8 @@ Item {
                 anchorItem: target
             });
         hideHover();
+        if (!_popup.open)
+            OverlayManager.close();
         _popup.open = !_popup.open;
     }
 

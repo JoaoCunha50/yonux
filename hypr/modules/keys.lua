@@ -1,0 +1,60 @@
+local keys = {
+    terminal = "SUPER + Return",
+    browser = "SUPER + B",
+    fileManager = "SUPER + E",
+    launcher = "SUPER + Space",
+    colorPicker = "SUPER + SHIFT + C",
+    clipboard = "SUPER + V",
+    lock = "SUPER + L",
+    screenshotArea = "SUPER + SHIFT + S",
+    screenshotScreen = "SUPER + S",
+    gameMode = "SUPER + G",
+    controlCenter = "SUPER + C",
+    power = "SUPER + Escape",
+    settings = "SUPER + comma",
+    exit = "SUPER + SHIFT + Escape",
+    closeWindow = "SUPER + Q",
+    fullscreen = "SUPER + SHIFT + F",
+    clientFullscreen = "SUPER + CTRL + F",
+    floating = "SUPER + A",
+    pin = "SUPER + SHIFT + P",
+    maximize = "SUPER + F",
+    toggleSplit = "SUPER + T",
+    narrowColumn = "SUPER + bracketleft",
+    widenColumn = "SUPER + bracketright",
+    focusLeft = "SUPER + Left",
+    focusRight = "SUPER + Right",
+    focusUp = "SUPER + Up",
+    focusDown = "SUPER + Down",
+    moveLeft = "SUPER + SHIFT + Left",
+    moveRight = "SUPER + SHIFT + Right",
+    moveUp = "SUPER + SHIFT + Up",
+    moveDown = "SUPER + SHIFT + Down",
+    shrinkWidth = "SUPER + CTRL + Left",
+    growWidth = "SUPER + CTRL + Right",
+    shrinkHeight = "SUPER + CTRL + Up",
+    growHeight = "SUPER + CTRL + Down",
+    dragWindow = "SUPER + mouse:272",
+    resizeWindow = "SUPER + mouse:273",
+    nextWorkspace = "SUPER + mouse_down",
+    previousWorkspace = "SUPER + mouse_up",
+    volumeUp = "XF86AudioRaiseVolume",
+    volumeDown = "XF86AudioLowerVolume",
+    mute = "XF86AudioMute",
+    muteMicrophone = "XF86AudioMicMute",
+    playPause = "XF86AudioPlay",
+    pause = "XF86AudioPause",
+    nextTrack = "XF86AudioNext",
+    previousTrack = "XF86AudioPrev",
+    brightnessUp = "XF86MonBrightnessUp",
+    brightnessDown = "XF86MonBrightnessDown",
+}
+
+for i = 1, 10 do
+    local key = i % 10
+    keys["workspace" .. i] = "SUPER + " .. key
+    keys["moveToWorkspace" .. i] = "SUPER + SHIFT + " .. key
+    keys["sendToWorkspace" .. i] = "SUPER + ALT + " .. key
+end
+
+return keys

@@ -3,14 +3,12 @@ import QtQuick
 import qs.theme
 import qs.components
 
-Item {
+ShellButton {
     id: root
 
     property bool shown: true
     property bool fillWidth: false
 
-    property alias icon: iconItem.icon
-    property string text: ""
     property int textSize: Theme.font.label.medium
 
     property bool alert: false
@@ -18,19 +16,35 @@ Item {
     property alias popup: anchor.popup
     property alias hover: anchor.hover
     property alias hoverText: anchor.hoverText
-    property bool clickable: popup !== null
+    clickable: popup !== null
+    showDefaultContent: false
 
     property Item contentItem: null
 
     readonly property bool hasLabel: icon.name !== "" || text !== ""
     readonly property alias popupOpen: anchor.popupOpen
-    property bool active: popupOpen
-    readonly property color contentColor: active ? Theme.colors.onActive : alert ? Theme.colors.alert : Theme.colors.fg
-
-    signal clicked
+    active: popupOpen
+    readonly property color labelColor: active ? Theme.colors.onActive : alert ? Theme.colors.alert : Theme.colors.fg
+    icon.color: labelColor
 
     implicitWidth: hasLabel ? row.implicitWidth + (clickable ? 12 : 0) : contentItem?.implicitWidth ?? 0
     implicitHeight: hasLabel ? 30 : contentItem?.implicitHeight ?? 0
+    color: {
+        if (!clickable)
+            return "transparent";
+        if (active)
+            return Theme.colors.active;
+        if (pressed)
+            return Theme.colors.controlPressedFill;
+        if (hovered)
+            return Theme.colors.controlHoverFill;
+        return "transparent";
+    }
+
+    onClicked: mouse => {
+        if (mouse.button === Qt.LeftButton)
+            anchor.togglePopup();
+    }
 
     onContentItemChanged: {
         if (!contentItem)
@@ -41,22 +55,7 @@ Item {
 
     PopupAnchor {
         id: anchor
-        hovered: hoverHandler.hovered
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        visible: root.clickable
-        radius: Theme.radius.sm
-        color: {
-            if (root.active)
-                return Theme.colors.active;
-            if (tapHandler.pressed)
-                return Theme.colors.controlPressedFill;
-            if (hoverHandler.hovered)
-                return Theme.colors.controlHoverFill;
-            return "transparent";
-        }
+        hovered: root.hovered
     }
 
     Item {
@@ -69,10 +68,9 @@ Item {
 
         ShellIcon {
             id: iconItem
+            icon: root.icon
             anchors.verticalCenter: parent.verticalCenter
             visible: icon.name !== ""
-            icon.size: 18
-            icon.color: root.contentColor
         }
 
         UIText {
@@ -83,23 +81,9 @@ Item {
             anchors.baselineOffset: capOffset
             visible: root.text !== ""
             text: root.text
-            color: root.contentColor
+            color: root.labelColor
             font.pixelSize: root.textSize
             font.weight: 550
-        }
-    }
-
-    HoverHandler {
-        id: hoverHandler
-        cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
-    }
-
-    TapHandler {
-        id: tapHandler
-        enabled: root.clickable
-        onTapped: {
-            root.clicked();
-            anchor.togglePopup();
         }
     }
 }

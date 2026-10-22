@@ -76,7 +76,7 @@ Overlay {
             Layout.preferredHeight: 48
 
             placeholderText: "Search apps..."
-            placeholderTextColor: Theme.colors.fgMuted
+            placeholderTextColor: Theme.colors.placeholder
 
             renderType: Text.QtRendering
             font.family: Theme.font.family

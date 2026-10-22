@@ -19,6 +19,7 @@ Singleton {
     readonly property color active: role("primary", "#89b4fa")
     readonly property color bg: role("surface_container_low", "#1e1e2e")
     readonly property color fg: role("on_surface", "#cdd6f4")
+    readonly property color placeholder: Qt.alpha(fgMuted, 0.55)
     readonly property color fgMuted: role("on_surface_variant", "#a6adc8")
     readonly property color onActive: role("on_primary", "#11111b")
     readonly property color alert: role("error", "#f38ba8")

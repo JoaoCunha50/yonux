@@ -1,6 +1,8 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import qs.theme
+import qs.config
 import qs.modules.bar
 import qs.modules.launcher
 import qs.modules.notifications
@@ -10,6 +12,8 @@ import qs.modules.wallpaper
 import qs.modules.settings
 
 ShellRoot {
+    Component.onCompleted: Keybindings.refresh()
+
     WallpaperBackground {}
 
     Variants {
@@ -20,6 +24,7 @@ ShellRoot {
             required property var modelData
 
             screen: modelData
+            WlrLayershell.namespace: "yonux-bar"
             anchors {
                 top: true
                 left: true

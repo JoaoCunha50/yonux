@@ -3,9 +3,10 @@ import QtQuick
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import qs.theme
+import qs.components
 import qs.modules.bar.tray
 
-Rectangle {
+ShellButton {
     id: root
 
     required property SystemTrayItem modelData
@@ -13,19 +14,21 @@ Rectangle {
     implicitWidth: 26
     implicitHeight: 26
     radius: width / 1.5
+    showDefaultContent: false
+    acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
 
     color: {
         let c = Theme.colors.active;
-        if (mouseArea.pressed)
+        if (pressed)
             return Qt.rgba(c.r, c.g, c.b, 0.35);
-        if (anchor.popupOpen || mouseArea.containsMouse)
+        if (anchor.popupOpen || hovered)
             return Qt.rgba(c.r, c.g, c.b, 0.25);
         return "transparent";
     }
 
     PopupAnchor {
         id: anchor
-        hovered: mouseArea.containsMouse
+        hovered: root.hovered
         hoverText: root.modelData.tooltipTitle || root.modelData.title || root.modelData.id
         popup: root.modelData.hasMenu ? menuComponent : null
     }
@@ -43,20 +46,12 @@ Rectangle {
         source: root.modelData.icon
     }
 
-    MouseArea {
-        id: mouseArea
-        anchors.fill: parent
-        hoverEnabled: true
-        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-        cursorShape: Qt.PointingHandCursor
-
-        onClicked: mouse => {
-            if (mouse.button === Qt.MiddleButton)
-                root.modelData.secondaryActivate();
-            else if (mouse.button === Qt.LeftButton || root.modelData.onlyMenu)
-                anchor.togglePopup();
-            else
-                root.modelData.activate();
-        }
+    onClicked: mouse => {
+        if (mouse.button === Qt.MiddleButton)
+            root.modelData.secondaryActivate();
+        else if (mouse.button === Qt.LeftButton || root.modelData.onlyMenu)
+            anchor.togglePopup();
+        else
+            root.modelData.activate();
     }
 }

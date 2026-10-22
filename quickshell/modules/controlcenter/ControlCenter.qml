@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import qs.components
 import qs.services
 import qs.theme
+import Quickshell
 
 Overlay {
     id: root
@@ -34,6 +35,16 @@ Overlay {
         onTriggered: root.now = Date.now()
     }
 
+    Loader {
+        id: facePicker
+        active: root.open
+        sourceComponent: ImagePicker {
+            title: "Choose a profile picture"
+            currentFolder: `file://${Quickshell.env("HOME")}/Pictures`
+            onAccepted: UserInfo.setFace(decodeURIComponent(selectedFile.toString().replace("file://", "")))
+        }
+    }
+
     ColumnLayout {
         width: parent.width
         height: parent.height
@@ -42,16 +53,44 @@ Overlay {
         RowLayout {
             Layout.fillWidth: true
             spacing: Theme.spacing.md
+            Layout.bottomMargin: Theme.spacing.xs
+            Layout.topMargin: -Theme.spacing.xs
 
             ShellImage {
-                implicitWidth: 44
-                implicitHeight: 44
+                implicitWidth: 48
+                implicitHeight: 48
                 circle: true
                 color: Theme.colors.field
-                source: root.open ? UserInfo.face : ""
+                source: UserInfo.face
                 fillMode: Image.PreserveAspectCrop
                 cache: false
                 fallbackIcon.name: Icons.person
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: Qt.alpha(Theme.colors.bg, 0.6)
+                    opacity: avatarArea.containsMouse ? 1 : 0
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Motion.small
+                        }
+                    }
+
+                    ShellIcon {
+                        anchors.centerIn: parent
+                        icon.name: Icons.edit
+                        icon.size: 22
+                    }
+                }
+
+                MouseArea {
+                    id: avatarArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: (facePicker.item as ImagePicker)?.open()
+                }
             }
 
             ColumnLayout {
@@ -61,7 +100,7 @@ Overlay {
                 UIText {
                     Layout.fillWidth: true
                     text: UserInfo.username
-                    font.pixelSize: Theme.font.title.small
+                    font.pixelSize: Theme.font.body.large
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
                 }

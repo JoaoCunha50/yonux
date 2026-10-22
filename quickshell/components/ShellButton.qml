@@ -16,6 +16,9 @@ Rectangle {
     property alias icon: iconItem.icon
     property bool iconFirst: false
     property bool active: false
+    property bool clickable: true
+    property int acceptedButtons: Qt.LeftButton
+    property bool showDefaultContent: true
 
     readonly property bool hovered: mouseArea.containsMouse
     readonly property bool pressed: mouseArea.pressed
@@ -41,7 +44,7 @@ Rectangle {
     readonly property int padding: type === ShellButton.Muted ? Theme.spacing.sm : Theme.spacing.md
     readonly property int iconInset: iconItem.visible && !iconOnly ? Math.round(iconItem.icon.size / 12) : 0
 
-    signal clicked
+    signal clicked(mouse: MouseEvent)
 
     implicitWidth: iconOnly ? implicitHeight : label.implicitWidth + (iconItem.visible ? iconItem.width + row.spacing : 0) + padding * 2 - iconInset
     implicitHeight: 30
@@ -60,6 +63,7 @@ Rectangle {
 
     Row {
         id: row
+        visible: root.showDefaultContent
         x: Math.round((root.width - width + root.iconInset) / 2) - (root.iconFirst ? root.iconInset : 0)
         anchors.verticalCenter: parent.verticalCenter
         layoutDirection: root.iconFirst ? Qt.RightToLeft : Qt.LeftToRight
@@ -88,9 +92,11 @@ Rectangle {
     MouseArea {
         id: mouseArea
         anchors.fill: parent
+        z: root.clickable ? 1 : -1
         enabled: root.enabled
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: root.clicked()
+        acceptedButtons: root.clickable ? root.acceptedButtons : Qt.NoButton
+        cursorShape: root.clickable ? Qt.PointingHandCursor : undefined
+        onClicked: mouse => root.clicked(mouse)
     }
 }

@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtQuick.Controls as Controls
 import Quickshell
 import Quickshell.Hyprland
 import qs.theme
@@ -34,6 +35,10 @@ FloatingWindow { // qmllint disable uncreatable-type
         {
             name: "Input",
             icon: Icons.input
+        },
+        {
+            name: "Shortcuts",
+            icon: Icons.keyboard
         },
         {
             name: "Bar",
@@ -86,8 +91,13 @@ FloatingWindow { // qmllint disable uncreatable-type
         }
     }
 
-    onSectionChanged: if (section === "About")
-        SystemInfo.refresh()
+    onSectionChanged: {
+        settingsScroll.cancelFlick();
+        settingsScroll.contentY = 0;
+        if (section === "About") SystemInfo.refresh();
+    }
+
+    onVisibleChanged: if (visible) settingsScroll.contentY = 0
 
     component SectionButton: Rectangle {
         id: item
@@ -128,12 +138,14 @@ FloatingWindow { // qmllint disable uncreatable-type
 
     onClosed: visible = false
 
-    FileDialog {
+    Loader {
         id: facePicker
-        title: "Choose a profile picture"
-        currentFolder: `file://${Quickshell.env("HOME")}/Pictures`
-        nameFilters: ["Images (*.png *.jpg *.jpeg *.webp)"]
-        onAccepted: UserInfo.setFace(decodeURIComponent(selectedFile.toString().replace("file://", "")))
+        active: root.visible
+        sourceComponent: ImagePicker {
+            title: "Choose a profile picture"
+            currentFolder: `file://${Quickshell.env("HOME")}/Pictures`
+            onAccepted: UserInfo.setFace(decodeURIComponent(selectedFile.toString().replace("file://", "")))
+        }
     }
 
     GlobalShortcut { // qmllint disable unresolved-type
@@ -198,7 +210,7 @@ FloatingWindow { // qmllint disable uncreatable-type
 
                             ShellIcon {
                                 anchors.centerIn: parent
-                                icon.name: Icons.editPhoto
+                                icon.name: Icons.edit
                                 icon.size: 24
                             }
                         }
@@ -208,7 +220,7 @@ FloatingWindow { // qmllint disable uncreatable-type
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: facePicker.open()
+                            onClicked: (facePicker.item as ImagePicker)?.open()
                         }
                     }
 
@@ -260,11 +272,29 @@ FloatingWindow { // qmllint disable uncreatable-type
         }
 
         Flickable {
+            id: settingsScroll
             Layout.fillWidth: true
             Layout.fillHeight: true
             contentWidth: width
             contentHeight: page.implicitHeight + Theme.spacing.lg * 2
             clip: true
+            boundsBehavior: Flickable.StopAtBounds
+
+            Controls.ScrollBar.vertical: Controls.ScrollBar {
+                id: pageScrollBar
+                policy: Controls.ScrollBar.AsNeeded
+                visible: settingsScroll.contentHeight > settingsScroll.height
+                width: 10
+                padding: 2
+                minimumSize: 0.05
+                contentItem: Rectangle {
+                    implicitWidth: 6
+                    radius: 3
+                    color: pageScrollBar.pressed ? Theme.colors.active : Theme.colors.fgMuted
+                    opacity: pageScrollBar.active ? 0.9 : 0.45
+                }
+                background: null
+            }
 
             ColumnLayout {
                 id: page
@@ -304,6 +334,13 @@ FloatingWindow { // qmllint disable uncreatable-type
                 AboutPage {
                     Layout.fillWidth: true
                     visible: root.section === "About"
+                }
+
+                Loader {
+                    Layout.fillWidth: true
+                    active: root.visible && root.section === "Shortcuts"
+                    visible: active
+                    sourceComponent: KeybindingsPage {}
                 }
             }
         }
