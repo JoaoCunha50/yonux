@@ -78,11 +78,11 @@ Package names may vary by distribution.
 
 Dependencies:
 
-- [`hyprland`](https://github.com/hyprwm/Hyprland) — requires Lua API support
-- [`quickshell`](https://git.outfoxxed.me/quickshell/quickshell) — with Qt Quick, Wayland, NetworkManager, PipeWire and UPower support
+- [`hyprland`](https://github.com/hyprwm/Hyprland)
+- [`quickshell`](https://git.outfoxxed.me/quickshell/quickshell)
 - [`networkmanager`](https://gitlab.freedesktop.org/NetworkManager/NetworkManager)
-- [`pipewire`](https://gitlab.freedesktop.org/pipewire/pipewire) — including PulseAudio compatibility for PulseAudio applications
-- [`wireplumber`](https://gitlab.freedesktop.org/pipewire/wireplumber) — provides `wpctl`
+- [`pipewire`](https://gitlab.freedesktop.org/pipewire/pipewire)
+- [`wireplumber`](https://gitlab.freedesktop.org/pipewire/wireplumber)
 - [`upower`](https://gitlab.freedesktop.org/upower/upower)
 - [`matugen`](https://github.com/InioX/matugen)
 - [`lm_sensors`](https://github.com/lm-sensors/lm-sensors)
@@ -91,7 +91,7 @@ Dependencies:
 - [`fuzzel`](https://codeberg.org/dnkl/fuzzel)
 - [`grim`](https://gitlab.freedesktop.org/emersion/grim)
 - [`slurp`](https://github.com/emersion/slurp)
-- [`libnotify`](https://gitlab.gnome.org/GNOME/libnotify) — provides `notify-send`
+- [`libnotify`](https://gitlab.gnome.org/GNOME/libnotify)
 - [`playerctl`](https://github.com/altdesktop/playerctl)
 - [`brightnessctl`](https://github.com/Hummer12007/brightnessctl)
 - [`hyprpicker`](https://github.com/hyprwm/hyprpicker)
@@ -103,13 +103,10 @@ Dependencies:
 - [`gvfs`](https://gitlab.gnome.org/GNOME/gvfs)
 - [`udisks2`](https://github.com/storaged-project/udisks)
 - [`gnome-keyring`](https://gitlab.gnome.org/GNOME/gnome-keyring)
-- [`glib`](https://gitlab.gnome.org/GNOME/glib) — provides `gsettings`
 - [`dconf`](https://gitlab.gnome.org/GNOME/dconf)
 - [`xdg-terminal-exec`](https://github.com/Vladimir-csp/xdg-terminal-exec)
 - [`xdg-desktop-portal-hyprland`](https://github.com/hyprwm/xdg-desktop-portal-hyprland)
 - [`xdg-desktop-portal-gtk`](https://github.com/flatpak/xdg-desktop-portal-gtk)
-- [`bash`](https://git.savannah.gnu.org/cgit/bash.git) and [`coreutils`](https://git.savannah.gnu.org/cgit/coreutils.git)
-- [`dbus`](https://gitlab.freedesktop.org/dbus/dbus) and [`systemd`](https://github.com/systemd/systemd) — session bus, user services and logind
 
 Fonts and themes:
 
