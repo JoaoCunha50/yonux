@@ -1,6 +1,5 @@
 -- yonux Hyprland config. Lives in the yonux-shell repo and is symlinked to
--- ~/.config/hypr (see install.sh). Each concern is its own module under
--- modules/; order matters where later modules override earlier ones.
+-- ~/.config/hypr (see install.sh). Each concern is its own module
 
 local function optional(mod)
     if package.searchpath == nil or package.searchpath(mod, package.path) then
@@ -14,6 +13,7 @@ end
 require("modules.env")
 require("modules.monitors")
 require("modules.input")
+require("modules.layer_focus")
 require("modules.misc")
 require("modules.decoration")
 require("modules.animations")

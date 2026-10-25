@@ -9,6 +9,16 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in {
       nixosModules.default = import ./nix/yonux.nix;
-      devShells.${system}.default = import ./nix/devshell.nix { inherit pkgs; };
+      devShells.${system} = {
+        default = import ./nix/devshell.nix { inherit pkgs; };
+        ci = pkgs.mkShell {
+          packages = [
+            pkgs.shellcheck
+            pkgs.quickshell
+            pkgs.kdePackages.qtdeclarative
+          ];
+          QML_IMPORT_PATH = "${pkgs.quickshell}/lib/qt-6/qml:${pkgs.kdePackages.qtdeclarative}/lib/qt-6/qml";
+        };
+      };
     };
 }

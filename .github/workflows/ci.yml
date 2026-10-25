@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [development, main]
+  push:
+    branches: [development, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check pull request target
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          [[ "$HEAD_REPOSITORY" == "$GITHUB_REPOSITORY" ]]
+          [[ "$HEAD_BRANCH" == development || "$HEAD_BRANCH" == release/* ]]
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: yonux-cli/go.mod
+      - name: Check Go
+        working-directory: yonux-cli
+        run: |
+          test -z "$(gofmt -l .)"
+          go vet ./...
+          go test ./...
+          go build -o "$RUNNER_TEMP/yonux" .
+      - uses: cachix/install-nix-action@v31
+      - name: Evaluate flake
+        run: nix flake check --no-build --no-write-lock-file
+      - name: Check shell scripts
+        run: git ls-files -z -- '*.sh' 'hypr/scripts/*' | nix develop .#ci --no-write-lock-file --command xargs -0 -r shellcheck
+      - name: Check QML
+        run: git ls-files -z -- '*.qml' '*.js' | nix develop .#ci --no-write-lock-file --command xargs -0 -r qmllint -E

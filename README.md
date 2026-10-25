@@ -151,7 +151,7 @@ cd yonux-shell
 ./install.sh
 ```
 
-The installer links `hypr/` to `~/.config/hypr` and `quickshell/` to
+The installer links `hypr/` to `~/.config/hypr` and `yonux-shell/` to
 `~/.config/quickshell/yonux`. Existing directories or files are moved to
 `*.bak-<timestamp>`; existing symlinks are replaced. Keep the checkout in place.
 The installer supplies the user configuration; packages and services must be
@@ -172,7 +172,7 @@ qs -c yonux
 During development, run directly from the checkout:
 
 ```sh
-qs -p quickshell/shell.qml
+qs -p yonux-shell/shell.qml
 ```
 
 Set or query the wallpaper through IPC:
@@ -236,8 +236,8 @@ by Git and loaded last, after generated settings.
 
 ### Colours
 
-[Colors.qml](quickshell/theme/Colors.qml) runs Matugen when the wallpaper or palette
-settings change, using [config.toml](quickshell/matugen/config.toml).
+[Colors.qml](yonux-shell/theme/Colors.qml) runs Matugen when the wallpaper or palette
+settings change, using [config.toml](yonux-shell/matugen/config.toml).
 
 | Application      | Generated output                             |
 | ---------------- | -------------------------------------------- |
@@ -293,5 +293,5 @@ and [Matugen](https://github.com/InioX/matugen). README organisation inspired by
 Typography and icons: [Google Sans Flex](https://github.com/google/fonts/tree/main/ofl/googlesansflex),
 [Material Symbols](https://github.com/google/material-design-icons) and
 [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) via Nerd Fonts.
-The bundled font's license is in [quickshell/assets/fonts/LICENSE](quickshell/assets/fonts/LICENSE).
+The bundled font's license is in [yonux-shell/assets/fonts/LICENSE](yonux-shell/assets/fonts/LICENSE).
 Yonux code is licensed under [MIT](LICENSE).
