@@ -1,7 +1,7 @@
 # Material Symbols Rounded
 
 `MaterialSymbolsRounded.ttf` is Google's Material Symbols Rounded variable font,
-loaded directly by `quickshell/theme/Icons.qml` for shell icons.
+loaded directly by `yonux-shell/theme/Icons.qml` for shell icons.
 
 - Upstream: https://github.com/google/material-design-icons
 - Copyright 2026 Google LLC. All Rights Reserved. (embedded font metadata)

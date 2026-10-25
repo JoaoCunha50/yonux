@@ -1,6 +1,6 @@
 local keys = {
     terminal = "SUPER + Return",
-    browser = "SUPER + B",
+    browser = "SUPER + W",
     fileManager = "SUPER + E",
     launcher = "SUPER + Space",
     colorPicker = "SUPER + SHIFT + C",
@@ -10,7 +10,7 @@ local keys = {
     screenshotScreen = "SUPER + S",
     gameMode = "SUPER + G",
     controlCenter = "SUPER + C",
-    power = "SUPER + Escape",
+    power = "SUPER + P",
     settings = "SUPER + comma",
     exit = "SUPER + SHIFT + Escape",
     closeWindow = "SUPER + Q",
