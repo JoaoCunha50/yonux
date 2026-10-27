@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Link this repo into place:
-#   ~/.config/hypr              -> hypr/
-#   ~/.config/quickshell/yonux  -> yonux-shell/ (run it with `qs -c yonux`)
+#   ~/.config/hypr              -> yonux/hypr/
+#   ~/.config/quickshell/yonux  -> yonux/shell/quickshell/ (run it with `qs -c yonux`)
 # An existing non-symlink target is moved aside to <name>.bak-<timestamp>.
 set -euo pipefail
 
@@ -22,5 +22,5 @@ link() {
   echo "linked $dst -> $src"
 }
 
-link "$repo/hypr" "$config/hypr"
-link "$repo/yonux-shell" "$config/quickshell/yonux"
+link "$repo/yonux/hypr" "$config/hypr"
+link "$repo/yonux/shell/quickshell" "$config/quickshell/yonux"

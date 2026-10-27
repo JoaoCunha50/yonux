@@ -33,9 +33,9 @@ jobs:
           [[ "$HEAD_BRANCH" == development || "$HEAD_BRANCH" == release/* ]]
       - uses: actions/setup-go@v7
         with:
-          go-version-file: yonux-cli/go.mod
+          go-version-file: yonux/cli/go.mod
       - name: Check Go
-        working-directory: yonux-cli
+        working-directory: yonux/cli
         run: |
           test -z "$(gofmt -l .)"
           go vet ./...
@@ -45,6 +45,9 @@ jobs:
       - name: Evaluate flake
         run: nix flake check --no-build --no-write-lock-file
       - name: Check shell scripts
-        run: git ls-files -z -- '*.sh' 'hypr/scripts/*' | nix develop .#ci --no-write-lock-file --command xargs -0 -r shellcheck
+        run: git ls-files -z -- '*.sh' 'yonux/hypr/scripts/*' | nix develop .#ci --no-write-lock-file --command xargs -0 -r shellcheck
       - name: Check QML
-        run: git ls-files -z -- '*.qml' '*.js' | nix develop .#ci --no-write-lock-file --command xargs -0 -r qmllint -E
+        run: |
+          mkdir -p "$RUNNER_TEMP/qml"
+          ln -s "$PWD/yonux/shell/quickshell" "$RUNNER_TEMP/qml/yonux"
+          find "$PWD/yonux/shell/quickshell" \( -name '*.qml' -o -name '*.js' \) -print0 | nix develop .#ci --no-write-lock-file --command xargs -0 -r qmllint -E -I "$RUNNER_TEMP/qml"

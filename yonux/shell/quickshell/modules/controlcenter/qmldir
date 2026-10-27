@@ -1,0 +1,5 @@
+module yonux.modules.controlcenter
+ControlCenter 1.0 ControlCenter.qml
+NotificationCard 1.0 NotificationCard.qml
+NotificationGroup 1.0 NotificationGroup.qml
+QuickTile 1.0 QuickTile.qml

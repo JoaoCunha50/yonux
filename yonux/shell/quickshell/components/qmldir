@@ -1,0 +1,17 @@
+module yonux.components
+DockedSurface 1.0 DockedSurface.qml
+IconProps 1.0 IconProps.qml
+ImagePicker 1.0 ImagePicker.qml
+KeyboardNavigation 1.0 KeyboardNavigation.qml
+singleton OverlayManager 1.0 OverlayManager.qml
+Overlay 1.0 Overlay.qml
+Reveal 1.0 Reveal.qml
+SearchInput 1.0 SearchInput.qml
+ShellButton 1.0 ShellButton.qml
+ShellIcon 1.0 ShellIcon.qml
+ShellImage 1.0 ShellImage.qml
+StyledSelect 1.0 StyledSelect.qml
+StyledSlider 1.0 StyledSlider.qml
+StyledSwitch 1.0 StyledSwitch.qml
+StyledTextField 1.0 StyledTextField.qml
+UIText 1.0 UIText.qml

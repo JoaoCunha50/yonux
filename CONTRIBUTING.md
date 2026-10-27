@@ -14,7 +14,7 @@ Feature PRs can be squash merged.
 
 The required GitHub check is named **CI**. Its steps run on one runner and check:
 
-- Go formatting, vet, tests and build, using the version in `yonux-cli/go.mod`.
+- Go formatting, vet, tests and build, using the version in `yonux/cli/go.mod`.
 - Pull request destination.
 - Nix flake evaluation.
 - ShellCheck for shell scripts.

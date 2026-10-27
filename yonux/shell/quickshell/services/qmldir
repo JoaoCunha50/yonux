@@ -1,0 +1,11 @@
+module yonux.services
+singleton Alerts 1.0 Alerts.qml
+singleton Audio 1.0 Audio.qml
+singleton GameMode 1.0 GameMode.qml
+singleton Network 1.0 Network.qml
+singleton NightLight 1.0 NightLight.qml
+singleton Notifications 1.0 Notifications.qml
+singleton SystemInfo 1.0 SystemInfo.qml
+singleton SystemStats 1.0 SystemStats.qml
+singleton UserInfo 1.0 UserInfo.qml
+singleton Wallpaper 1.0 Wallpaper.qml

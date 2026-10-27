@@ -1,0 +1,5 @@
+module yonux.theme
+singleton Colors 1.0 Colors.qml
+singleton Icons 1.0 Icons.qml
+singleton Motion 1.0 Motion.qml
+singleton Theme 1.0 Theme.qml
