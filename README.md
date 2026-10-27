@@ -131,7 +131,7 @@ connections, and enable UPower for battery reporting. Start Hypridle in the
 Hyprland session so the supplied lock and idle policy takes effect. The supplied
 autostart configuration starts the shell, clipboard watchers, Hyprsunset and
 GNOME Keyring, and starts the `hyprpolkitagent` user service; ensure that service
-is available or adapt [autostart.lua](hypr/modules/autostart.lua) to your installation.
+is available or adapt [autostart.lua](yonux/hypr/modules/autostart.lua) to your installation.
 Configure desktop portals and keyring session integration for your distribution.
 
 To match the remaining NixOS desktop integrations, also configure Bluetooth
@@ -151,7 +151,7 @@ cd yonux-shell
 ./install.sh
 ```
 
-The installer links `hypr/` to `~/.config/hypr` and `yonux-shell/` to
+The installer links `yonux/hypr/` to `~/.config/hypr` and `yonux/shell/quickshell/` to
 `~/.config/quickshell/yonux`. Existing directories or files are moved to
 `*.bak-<timestamp>`; existing symlinks are replaced. Keep the checkout in place.
 The installer supplies the user configuration; packages and services must be
@@ -166,14 +166,14 @@ other applications yourself or change their bindings.
 Start a Hyprland session to launch the shell automatically, or run:
 
 ```sh
-qs -c yonux
+QML_IMPORT_PATH=~/.config/quickshell qs -c yonux
 ```
 
-During development, run directly from the checkout:
-
-```sh
-qs -p yonux-shell/shell.qml
-```
+Each shell folder is a QML module named after its path (`import yonux.theme`,
+`import yonux.modules.bar`), declared by the `qmldir` file in that folder. Qt
+finds them through the `~/.config/quickshell/yonux` link, so `~/.config/quickshell`
+must be on `QML_IMPORT_PATH`; the Hyprland autostart sets it. Add new QML files
+to their folder's `qmldir`, and give a new folder its own `qmldir`.
 
 Set or query the wallpaper through IPC:
 
@@ -215,8 +215,8 @@ qs -c yonux ipc call wallpaper get
 | Super + Shift + S / Super + S | Capture area / focused monitor                          |
 | Super + Shift + Escape        | Exit Hyprland                                           |
 
-See [hypr/modules/binds.lua](hypr/modules/binds.lua) for bindings and
-[hypr/modules/special.lua](hypr/modules/special.lua) for special workspaces.
+See [yonux/hypr/modules/binds.lua](yonux/hypr/modules/binds.lua) for bindings and
+[yonux/hypr/modules/special.lua](yonux/hypr/modules/special.lua) for special workspaces.
 Compositor game mode adjusts Hyprland effects; Feral GameMode is a separate service.
 
 ## Configuration
@@ -231,13 +231,13 @@ are saved under `$XDG_CONFIG_HOME/yonux` (normally `~/.config/yonux`):
 | `hypr.json`    | Hyprland preferences        |
 | `hyprland.lua` | Generated Hyprland settings |
 
-Put machine-specific Hyprland overrides in `hypr/user.lua`. This file is ignored
+Put machine-specific Hyprland overrides in `yonux/hypr/user.lua`. This file is ignored
 by Git and loaded last, after generated settings.
 
 ### Colours
 
-[Colors.qml](yonux-shell/theme/Colors.qml) runs Matugen when the wallpaper or palette
-settings change, using [config.toml](yonux-shell/matugen/config.toml).
+[Colors.qml](yonux/shell/quickshell/theme/Colors.qml) runs Matugen when the wallpaper or palette
+settings change, using [config.toml](yonux/shell/quickshell/matugen/config.toml).
 
 | Application      | Generated output                             |
 | ---------------- | -------------------------------------------- |
@@ -281,7 +281,7 @@ Run `sensors -j` and check for supported CPU labels. Installing `lm_sensors`
 does not guarantee that the kernel exposes a sensor for your hardware.
 
 **Where is the lock screen?**
-Yonux uses [Hyprlock](hypr/hyprlock.conf) and [Hypridle](hypr/hypridle.conf).
+Yonux uses [Hyprlock](yonux/hypr/hyprlock.conf) and [Hypridle](yonux/hypr/hypridle.conf).
 The supplied idle policy locks after ten minutes and turns displays off after eleven.
 
 ## Credits
@@ -293,5 +293,5 @@ and [Matugen](https://github.com/InioX/matugen). README organisation inspired by
 Typography and icons: [Google Sans Flex](https://github.com/google/fonts/tree/main/ofl/googlesansflex),
 [Material Symbols](https://github.com/google/material-design-icons) and
 [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) via Nerd Fonts.
-The bundled font's license is in [yonux-shell/assets/fonts/LICENSE](yonux-shell/assets/fonts/LICENSE).
+The bundled font's license is in [LICENSE](yonux/shell/quickshell/assets/fonts/LICENSE).
 Yonux code is licensed under [MIT](LICENSE).

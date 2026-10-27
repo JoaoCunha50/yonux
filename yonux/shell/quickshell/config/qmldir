@@ -1,0 +1,9 @@
+module yonux.config
+singleton HyprSettings 1.0 HyprSettings.qml
+JsonConfig 1.0 JsonConfig.qml
+JsonFile 1.0 JsonFile.qml
+singleton Keybindings 1.0 Keybindings.qml
+singleton Paths 1.0 Paths.qml
+Setting 1.0 Setting.qml
+SettingsStore 1.0 SettingsStore.qml
+singleton ShellSettings 1.0 ShellSettings.qml

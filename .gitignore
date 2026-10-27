@@ -1,4 +1,4 @@
 .direnv
-hypr/user.lua
-yonux-shell/.qmlls.ini
+yonux/hypr/user.lua
+yonux/shell/quickshell/.qmlls.ini
 docs/

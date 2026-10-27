@@ -1,0 +1,7 @@
+module yonux.modules.settings
+AboutPage 1.0 AboutPage.qml
+BarEditor 1.0 BarEditor.qml
+KeybindingEditor 1.0 KeybindingEditor.qml
+KeybindingsPage 1.0 KeybindingsPage.qml
+SettingRow 1.0 SettingRow.qml
+SettingsWindow 1.0 SettingsWindow.qml

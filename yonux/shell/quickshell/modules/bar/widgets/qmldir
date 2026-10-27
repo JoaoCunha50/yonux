@@ -1,0 +1,15 @@
+module yonux.modules.bar.widgets
+AudioWidget 1.0 AudioWidget.qml
+BatteryWidget 1.0 BatteryWidget.qml
+ClockWidget 1.0 ClockWidget.qml
+CpuWidget 1.0 CpuWidget.qml
+DiskWidget 1.0 DiskWidget.qml
+MemoryWidget 1.0 MemoryWidget.qml
+NetworkWidget 1.0 NetworkWidget.qml
+NotificationsWidget 1.0 NotificationsWidget.qml
+PowerWidget 1.0 PowerWidget.qml
+SeparatorWidget 1.0 SeparatorWidget.qml
+TemperatureWidget 1.0 TemperatureWidget.qml
+TitleWidget 1.0 TitleWidget.qml
+TrayWidget 1.0 TrayWidget.qml
+WorkspacesWidget 1.0 WorkspacesWidget.qml
