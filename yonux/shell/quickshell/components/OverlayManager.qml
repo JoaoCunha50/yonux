@@ -10,6 +10,7 @@ Singleton {
     property int _tokens: 0
 
     readonly property HyprlandMonitor monitor: Hyprland.focusedMonitor
+    readonly property string focusedScreen: monitor?.name ?? ""
     readonly property HyprlandWorkspace workspace: special ? Hyprland.workspaces.values.find(ws => ws.name === special) ?? null : monitor?.activeWorkspace ?? null
 
     readonly property string special: monitor?.lastIpcObject.specialWorkspace?.name ?? ""
@@ -18,7 +19,7 @@ Singleton {
     signal settingsRequested
 
     onFullscreenChanged: if (fullscreen)
-        close(monitor?.name ?? "")
+        close(focusedScreen)
 
     function token(prefix: string): string {
         _tokens += 1;
@@ -38,6 +39,10 @@ Singleton {
     }
 
     function set(screen: string, name: string): void {
+        if (screen === "") {
+            console.warn(`OverlayManager: no screen given for "${name || "close"}"`);
+            return;
+        }
         let next = Object.assign({}, current);
         if (name === "")
             delete next[screen];
@@ -47,23 +52,24 @@ Singleton {
     }
 
     function open(name: string, screen: string): void {
-        screen = screen || (monitor?.name ?? "");
-        const isMonitorFullscreen = fullscreen && screen === monitor?.name;
+        const isMonitorFullscreen = fullscreen && screen === focusedScreen;
         if (!isMonitorFullscreen)
             set(screen, name);
     }
 
     function close(screen: string): void {
-        const nameToClose = screen || (monitor?.name ?? "");
-        set(nameToClose, "");
+        set(screen, "");
     }
 
     function toggle(name: string, screen: string): void {
-        screen = screen || (monitor?.name ?? "");
         if (isOpen(name, screen))
             close(screen);
         else
             open(name, screen);
+    }
+
+    function toggleFocused(name: string): void {
+        toggle(name, focusedScreen);
     }
 
     Component.onCompleted: {

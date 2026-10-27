@@ -1,9 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Hyprland
 import yonux.theme
-import yonux.components
 import yonux.config
 import yonux.modules.bar
 import yonux.modules.launcher
@@ -55,26 +53,13 @@ ShellRoot {
         }
     }
 
-    // Registered once here, not per overlay instance; each toggles the focused monitor.
-    GlobalShortcut { // qmllint disable unresolved-type
-        appid: "yonux"
-        name: "launcher"
-        onPressed: OverlayManager.toggle("launcher", "")
-    }
-
-    GlobalShortcut { // qmllint disable unresolved-type
-        appid: "yonux"
-        name: "power"
-        onPressed: OverlayManager.toggle("power", "")
-    }
-
-    GlobalShortcut { // qmllint disable unresolved-type
-        appid: "yonux"
-        name: "controlcenter"
-        onPressed: OverlayManager.toggle("controlcenter", "")
-    }
-
     ToastStack {}
 
-    SettingsWindow {}
+    SettingsWindow {
+        id: settings
+    }
+
+    Shortcuts {
+        settingsWindow: settings
+    }
 }

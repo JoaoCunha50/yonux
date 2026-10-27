@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtQuick.Controls as Controls
 import Quickshell
-import Quickshell.Hyprland
 import yonux.theme
 import yonux.config
 import yonux.services
@@ -94,10 +93,12 @@ FloatingWindow { // qmllint disable uncreatable-type
     onSectionChanged: {
         settingsScroll.cancelFlick();
         settingsScroll.contentY = 0;
-        if (section === "About") SystemInfo.refresh();
+        if (section === "About")
+            SystemInfo.refresh();
     }
 
-    onVisibleChanged: if (visible) settingsScroll.contentY = 0
+    onVisibleChanged: if (visible)
+        settingsScroll.contentY = 0
 
     component SectionButton: Rectangle {
         id: item
@@ -146,12 +147,6 @@ FloatingWindow { // qmllint disable uncreatable-type
             currentFolder: `file://${Quickshell.env("HOME")}/Pictures`
             onAccepted: UserInfo.setFace(decodeURIComponent(selectedFile.toString().replace("file://", "")))
         }
-    }
-
-    GlobalShortcut { // qmllint disable unresolved-type
-        appid: "yonux"
-        name: "settings"
-        onPressed: root.visible = !root.visible
     }
 
     Connections {
