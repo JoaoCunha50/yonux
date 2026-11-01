@@ -239,6 +239,21 @@ by Git and loaded last, after generated settings.
 [Colors.qml](yonux/shell/quickshell/theme/Colors.qml) runs Matugen when the wallpaper or palette
 settings change, using [config.toml](yonux/shell/quickshell/matugen/config.toml).
 
+To change a template or the config, put your version at the same path under
+`~/.config/yonux/user_preferences/matugen/` (for example
+`user_preferences/matugen/templates/fish-colors.fish`) and run `materialize` again.
+Your file wins over the default, and a new file there adds a template. Delete it
+to get the default back. Files in `~/.config/yonux/matugen/` are managed output:
+`materialize` replaces them with the selected base or preference file, and removes
+them when neither source exists, even if the active file was edited. It never
+copies those edits into `user_preferences`.
+
+Keep Matugen customizations in `user_preferences/matugen/`. In development,
+editing an active symlink edits the checkout itself; edit the checkout for base
+development or use preferences for personal overrides. Hyprland's
+`~/.config/hypr/user.lua` remains a dedicated personalization file and is not
+managed by the current Matugen-only `materialize`.
+
 | Application      | Generated output                             |
 | ---------------- | -------------------------------------------- |
 | Hyprland borders | `~/.cache/yonux/hypr-colors.lua`             |
