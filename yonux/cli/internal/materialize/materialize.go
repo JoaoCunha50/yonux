@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 type tree struct {
@@ -69,12 +71,43 @@ type manifest map[string]string
 
 func (l Layout) manifestPath() string { return filepath.Join(l.State, "materialize.json") }
 
-func (l Layout) readManifest() manifest {
+func (l Layout) readManifest() (manifest, error) {
 	m := manifest{}
-	if b, err := os.ReadFile(l.manifestPath()); err == nil {
-		_ = json.Unmarshal(b, &m)
+	b, err := os.ReadFile(l.manifestPath())
+	if os.IsNotExist(err) {
+		return m, nil
 	}
-	return m
+	if err != nil {
+		return nil, fmt.Errorf("read manifest: %w", err)
+	}
+	if err := json.Unmarshal(b, &m); err != nil {
+		return nil, fmt.Errorf("decode manifest: %w", err)
+	}
+	if m == nil {
+		return nil, fmt.Errorf("decode manifest: expected an object, got null")
+	}
+	if err := validateManifest(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func validateManifest(m manifest) error {
+	for key := range m {
+		managed := false
+		if !path.IsAbs(key) && path.Clean(key) == key {
+			for _, t := range trees {
+				if strings.HasPrefix(key, filepath.ToSlash(t.Dst)+"/") {
+					managed = true
+					break
+				}
+			}
+		}
+		if !managed {
+			return fmt.Errorf("invalid manifest path %q: expected a normalized relative file path inside a managed tree", key)
+		}
+	}
+	return nil
 }
 
 func (l Layout) writeManifest(m manifest) error {
@@ -99,7 +132,10 @@ func Materialize(l Layout) error {
 	if info, err := os.Stat(l.Base); err != nil || !info.IsDir() {
 		return fmt.Errorf("base dir not found: %s (set YONUX_BASE to the repo's yonux/ folder in dev)", l.Base)
 	}
-	prev := l.readManifest()
+	prev, err := l.readManifest()
+	if err != nil {
+		return err
+	}
 	next := manifest{}
 
 	for _, t := range trees {
@@ -135,12 +171,17 @@ func Materialize(l Layout) error {
 		}
 	}
 
-	for key := range prev {
-		if _, ok := next[key]; ok {
-			continue
+	for _, t := range trees {
+		root := filepath.Join(l.Config, t.Dst)
+		prefix := filepath.ToSlash(t.Dst) + "/"
+		for key := range prev {
+			if _, ok := next[key]; ok || !strings.HasPrefix(key, prefix) {
+				continue
+			}
+			rel := filepath.FromSlash(strings.TrimPrefix(key, prefix))
+			_ = os.Remove(filepath.Join(root, rel))
+			pruneEmptyParents(root, filepath.Dir(rel))
 		}
-		_ = os.Remove(filepath.Join(l.Config, filepath.FromSlash(key)))
-		pruneEmptyParents(l.Config, filepath.Dir(filepath.FromSlash(key)))
 	}
 
 	if err := l.writeManifest(next); err != nil {
