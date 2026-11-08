@@ -1,9 +1,9 @@
-pkgbase = yonux-shell-git
+pkgbase = yonux-git
 	pkgdesc = Hyprland and Quickshell desktop configuration with the Yonux CLI
 	pkgver = r62.g533a2b7
 	pkgrel = 1
 	url = https://github.com/JoaoCunha50/yonux
-	install = yonux-shell.install
+	install = yonux.install
 	arch = x86_64
 	license = MIT
 	makedepends = git
@@ -52,10 +52,10 @@ pkgbase = yonux-shell-git
 	optdepends = power-profiles-daemon: power profile service
 	optdepends = gamescope: optional game session integration
 	optdepends = gamemode: optional game performance integration
-	provides = yonux-shell
-	conflicts = yonux-shell
+	provides = yonux
+	conflicts = yonux
 	options = !debug
 	source = yonux::git+https://github.com/JoaoCunha50/yonux.git#branch=development
 	sha256sums = SKIP
 
-pkgname = yonux-shell-git
+pkgname = yonux-git

@@ -74,14 +74,14 @@ sudo nixos-rebuild switch --flake /etc/nixos#YOUR_HOST
 ### CachyOS / Arch Linux package
 
 The package recipe is kept in
-[`packaging/aur/yonux-shell-git`](packaging/aur/yonux-shell-git). It has not been
+[`packaging/aur/yonux-git`](packaging/aur/yonux-git). It has not been
 published to the AUR; build it locally rather than assuming an AUR helper can
 install it:
 
 ```sh
 sudo pacman -Syu --needed base-devel git
 git clone --branch development https://github.com/JoaoCunha50/yonux.git
-cd yonux/packaging/aur/yonux-shell-git
+cd yonux/packaging/aur/yonux-git
 makepkg -si
 yonux install
 ```

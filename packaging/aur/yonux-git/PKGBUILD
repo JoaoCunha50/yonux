@@ -1,5 +1,5 @@
 # Maintainer: Yonux contributors
-pkgname=yonux-shell-git
+pkgname=yonux-git
 pkgver=r62.g533a2b7
 pkgrel=1
 pkgdesc='Hyprland and Quickshell desktop configuration with the Yonux CLI'
@@ -55,9 +55,9 @@ optdepends=(
   'gamescope: optional game session integration'
   'gamemode: optional game performance integration'
 )
-provides=('yonux-shell')
-conflicts=('yonux-shell')
-install=yonux-shell.install
+provides=('yonux')
+conflicts=('yonux')
+install=yonux.install
 options=('!debug')
 source=("yonux::git+${url}.git#branch=development")
 sha256sums=('SKIP')
