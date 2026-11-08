@@ -22,7 +22,7 @@ Singleton {
         {
             label: "Logout",
             icon: Icons.logout,
-            command: ["uwsm", "stop"],
+            command: ["sh", "-c", "if command -v uwsm >/dev/null 2>&1 && uwsm check is-active >/dev/null 2>&1; then exec uwsm stop; else exec hyprctl dispatch exit; fi"],
             confirm: true
         },
         {

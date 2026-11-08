@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"joaocunha50/yonux-cli/internal/apply"
 	devapply "joaocunha50/yonux-cli/internal/dev-apply"
 	"joaocunha50/yonux-cli/internal/materialize"
 )
@@ -15,6 +16,8 @@ import (
 const usage = `usage: yonux <command>
 
 commands:
+  install                        - prepare user configuration from the selected base
+  apply                          - reapply the selected base and personal overrides
   materialize                    - lay the shipped config into ~/.config
   dev-apply --from <clone root>  - build and install a clone for normal use, and record it as the source`
 
@@ -28,6 +31,18 @@ func main() {
 	switch os.Args[1] {
 	case "materialize":
 		err = runMaterialize()
+	case "install", "apply":
+		if len(os.Args) != 2 {
+			err = errUsage
+			break
+		}
+
+		l, e := materialize.DefaultLayout()
+		if e != nil {
+			err = e
+		} else {
+			err = apply.Run(l)
+		}
 	case "dev-apply":
 		err = runDevApply(os.Args[2:])
 	default:

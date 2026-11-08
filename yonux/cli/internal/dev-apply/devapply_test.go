@@ -48,6 +48,11 @@ func clone(t *testing.T) string {
 	write(t, filepath.Join(y, "hypr/scripts/tool"), "#!/bin/sh", 0o755)
 	write(t, filepath.Join(y, "hypr/user.lua"), "clone user.lua", 0o644)
 	write(t, filepath.Join(y, "shell/quickshell/shell.qml"), "shell from clone", 0o644)
+	schema, err := os.ReadFile("../../../shell/quickshell/config/HyprSettings.qml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	write(t, filepath.Join(y, "shell/quickshell/config/HyprSettings.qml"), string(schema), 0o644)
 	write(t, filepath.Join(y, "shell/matugen/config.toml"), "matugen from clone", 0o644)
 	if err := os.Symlink("/run/user/1000/quickshell/vfs/x/.qmlls.ini", filepath.Join(y, "shell/quickshell/.qmlls.ini")); err != nil {
 		t.Fatal(err)
@@ -56,6 +61,7 @@ func clone(t *testing.T) string {
 }
 
 func target(t *testing.T) Target {
+	t.Setenv("HYPRLAND_INSTANCE_SIGNATURE", "")
 	dir := t.TempDir()
 	return Target{
 		Layout: materialize.Layout{Config: filepath.Join(dir, "config"), State: filepath.Join(dir, "state")},
@@ -134,7 +140,7 @@ func TestRunReplacesLinkIntoCloneAndKeepsUserLua(t *testing.T) {
 	}
 }
 
-func TestRunReplacesLiveTreeKeepingOnlyUserLua(t *testing.T) {
+func TestRunPreservesUnmanagedFiles(t *testing.T) {
 	from, tg := clone(t), target(t)
 	live := filepath.Join(tg.Layout.Config, "hypr")
 	write(t, filepath.Join(live, "user.lua"), "live user.lua", 0o644)
@@ -153,7 +159,9 @@ func TestRunReplacesLiveTreeKeepingOnlyUserLua(t *testing.T) {
 	if got := read(t, filepath.Join(live, "hyprland.lua")); got != "hypr from clone" {
 		t.Fatalf("hyprland.lua = %q", got)
 	}
-	absent(t, filepath.Join(live, "stray.conf"))
+	if got := read(t, filepath.Join(live, "stray.conf")); got != "old" {
+		t.Fatalf("unmanaged file changed: %q", got)
+	}
 	if got := read(t, other); got != "another config" {
 		t.Fatalf("other quickshell config changed: %q", got)
 	}

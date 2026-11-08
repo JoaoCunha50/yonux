@@ -1,11 +1,10 @@
 // Package devapply installs a yonux clone for normal use: it builds the
-// binaries into ~/.local/bin, copies the clone's config into ~/.config,
-// materializes Matugen from it, and records the clone as the source.
+// binaries into ~/.local/bin, applies the shared configuration and records the source.
 package devapply
 
 import (
 	"fmt"
-	"io/fs"
+	"joaocunha50/yonux-cli/internal/apply"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,17 +19,6 @@ type Build func(dir, out string) error
 type Target struct {
 	Layout materialize.Layout // Config and State; Base is set by Run from the clone
 	Bin    string             // ~/.local/bin
-}
-
-type tree struct {
-	Src  string   // relative to <clone>/yonux
-	Dst  string   // relative to Config
-	Keep []string // live files carried over, never taken from Src
-}
-
-var trees = []tree{
-	{Src: "hypr", Dst: "hypr", Keep: []string{"user.lua"}},
-	{Src: "shell/quickshell", Dst: "quickshell/yonux"},
 }
 
 type binary struct {
@@ -75,15 +63,9 @@ func Run(from string, t Target, build Build) error {
 		}
 	}
 
-	for _, tr := range trees {
-		if err := replaceTree(filepath.Join(y, tr.Src), filepath.Join(t.Layout.Config, tr.Dst), tr.Keep); err != nil {
-			return fmt.Errorf("apply %s: %w", tr.Dst, err)
-		}
-	}
-
 	t.Layout.Base = y
-	if err := materialize.Materialize(t.Layout); err != nil {
-		return fmt.Errorf("materialize: %w", err)
+	if err := apply.Run(t.Layout); err != nil {
+		return fmt.Errorf("apply: %w", err)
 	}
 	if err := source.Save(t.Layout.State, source.Source{Checkout: from}); err != nil {
 		return fmt.Errorf("record source: %w", err)
@@ -97,8 +79,8 @@ func validateClone(root string) error {
 	for _, b := range binaries {
 		need = append(need, filepath.Join(y, b.Module, "go.mod"))
 	}
-	for _, t := range trees {
-		need = append(need, filepath.Join(y, t.Src))
+	for _, dir := range []string{"hypr", "shell/quickshell"} {
+		need = append(need, filepath.Join(y, dir))
 	}
 	for _, p := range need {
 		if _, err := os.Stat(p); err != nil {
@@ -106,91 +88,6 @@ func validateClone(root string) error {
 		}
 	}
 	return nil
-}
-
-// replaceTree swaps dst for a copy of src's regular files (symlinks are
-// skipped), carrying each keep file over from the live dst. A dst that is a
-// symlink is unlinked, never written through.
-func replaceTree(src, dst string, keep []string) error {
-	parent := filepath.Dir(dst)
-	if err := os.MkdirAll(parent, 0o755); err != nil {
-		return err
-	}
-	tmp, err := os.MkdirTemp(parent, ".yonux-new-*")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tmp)
-	if err := os.Chmod(tmp, 0o755); err != nil {
-		return err
-	}
-
-	kept := map[string]bool{}
-	for _, name := range keep {
-		kept[name] = true
-	}
-	err = filepath.WalkDir(src, func(p string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		rel, _ := filepath.Rel(src, p)
-		switch {
-		case d.IsDir():
-			return os.MkdirAll(filepath.Join(tmp, rel), 0o755)
-		case !d.Type().IsRegular() || kept[rel]:
-			return nil
-		}
-		return copyFile(p, filepath.Join(tmp, rel))
-	})
-	if err != nil {
-		return err
-	}
-	for _, name := range keep {
-		live := filepath.Join(dst, name)
-		if info, err := os.Stat(live); err == nil && info.Mode().IsRegular() {
-			if err := copyFile(live, filepath.Join(tmp, name)); err != nil {
-				return fmt.Errorf("keep %s: %w", name, err)
-			}
-		}
-	}
-
-	// Move the live tree aside first, so a failed swap can put it back. A
-	// symlinked dst is moved and removed as a link, never followed.
-	old := ""
-	if _, err := os.Lstat(dst); err == nil {
-		old = tmp + ".old"
-		if err := os.Rename(dst, old); err != nil {
-			return err
-		}
-	}
-	if err := os.Rename(tmp, dst); err != nil {
-		if old != "" {
-			_ = os.Rename(old, dst)
-		}
-		return err
-	}
-	if old != "" {
-		return os.RemoveAll(old)
-	}
-	return nil
-}
-
-func copyFile(src, dst string) error {
-	info, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-	b, err := os.ReadFile(src)
-	if err != nil {
-		return err
-	}
-	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-		return err
-	}
-	if err := os.WriteFile(dst, b, info.Mode().Perm()); err != nil {
-		return err
-	}
-	return os.Chmod(dst, info.Mode().Perm())
 }
 
 // GoBuild runs `go build -o out ./cmd` in dir.
