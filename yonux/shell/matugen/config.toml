@@ -18,3 +18,8 @@ output_path = "~/.cache/yonux/hyprlock-colors.conf"
 input_path = "./templates/ghostty-colors"
 output_path = "~/.config/ghostty/yonux-colors"
 post_hook = "pkill -USR2 -x ghostty || true"
+
+[templates.tmux]
+input_path = "./templates/tmux-colors.conf"
+output_path = "~/.config/tmux/yonux-colors.conf"
+post_hook = "command -v tmux >/dev/null && tmux source-file ~/.config/tmux/yonux-colors.conf || true"

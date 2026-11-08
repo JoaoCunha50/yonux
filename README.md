@@ -262,11 +262,13 @@ personalization file and is not managed by the Matugen-only `materialize`.
 | Fish             | `~/.config/fish/conf.d/zz-yonux-colors.fish` |
 | Hyprlock         | `~/.cache/yonux/hyprlock-colors.conf`        |
 | Ghostty          | `~/.config/ghostty/yonux-colors`             |
+| Tmux             | `~/.config/tmux/yonux-colors.conf`           |
 
 Hyprland and Hyprlock include their generated files through the supplied
-configuration. Include the Ghostty output in your Ghostty configuration to use
-it. The templates reload Hyprland and Ghostty and notify existing Fish sessions
-of colour changes. Add templates and entries in `config.toml` to theme more applications.
+configuration. Include the Ghostty and Tmux outputs in their respective
+configurations to use them. The templates reload Hyprland, Ghostty and running
+Tmux servers, and notify existing Fish sessions of colour changes. Add templates
+and entries in `config.toml` to theme more applications.
 
 ### Fonts and sensors
 
