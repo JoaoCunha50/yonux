@@ -1,0 +1,21 @@
+# shellcheck shell=bash
+post_install() {
+  cat <<'EOF'
+Yonux assets are installed under /usr/share/yonux; no home directory was changed.
+As your regular user, run: yonux install
+To apply updated packaged assets later, run: yonux apply
+These commands compose configuration copies and back up colliding unmanaged
+files. Your local hypr/user.lua and unrelated files are preserved.
+Enable NetworkManager, UPower, PipeWire and WirePlumber for your session.
+The Hyprland and GTK portal backends coexist; keep both installed.
+UWSM is optional: a normal Hyprland session is supported.
+EOF
+}
+
+post_upgrade() {
+  cat <<'EOF'
+Yonux packaged assets were updated; your home directory was not changed.
+As your regular user, run: yonux apply
+Only previously unmanaged collisions create backups; repeated applies do not.
+EOF
+}

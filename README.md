@@ -71,6 +71,59 @@ sudo nix flake update yonux-shell --flake /etc/nixos
 sudo nixos-rebuild switch --flake /etc/nixos#YOUR_HOST
 ```
 
+### CachyOS / Arch Linux package
+
+The package recipe is kept in
+[`packaging/aur/yonux-shell-git`](packaging/aur/yonux-shell-git). It has not been
+published to the AUR; build it locally rather than assuming an AUR helper can
+install it:
+
+```sh
+sudo pacman -Syu --needed base-devel git
+git clone --branch development https://github.com/JoaoCunha50/yonux.git
+cd yonux/packaging/aur/yonux-shell-git
+makepkg -si
+yonux install
+```
+
+Run `makepkg` and `yonux install` as your regular user, not root; `makepkg -si`
+requests elevation only for package operations. The recipe builds both Go
+commands and installs `/usr/bin/yonux`, `/usr/bin/yonux-ipc`, and the Hyprland,
+Quickshell, Matugen and portal assets under `/usr/share/yonux` from the same
+`development` revision. Only Git and Go (at least 1.26.10) are additional build
+dependencies beyond Arch's standard `base-devel` environment. Package installation
+and upgrade hooks never write to a user's home directory.
+
+`yonux install` composes copies into your configuration roots. Existing files
+that are not yet managed are backed up under `$XDG_STATE_HOME/yonux/backups/`;
+the ownership manifest records their original locations. Reapplying does not
+create duplicate backups. `hypr/user.lua` and unrelated files are preserved.
+After upgrading the package, run `yonux apply` to refresh the copies.
+
+The supported package versions start at
+[`hyprland` 0.57.1](https://archlinux.org/packages/extra/x86_64/hyprland/),
+[`quickshell` 0.3.2](https://archlinux.org/packages/extra/x86_64/quickshell/), and
+[`matugen` 4.2.0](https://archlinux.org/packages/extra/x86_64/matugen/).
+The recipe includes the runtime utilities listed below, including PipeWire,
+WirePlumber, `xdg-desktop-portal`, `xdg-desktop-portal-hyprland` and
+`xdg-desktop-portal-gtk`. Keep both portal backends: Hyprland handles screencasting
+and GTK provides file pickers; other desktop portal packages can coexist.
+Enable NetworkManager and UPower, and start PipeWire and WirePlumber in your user
+session using the distribution's service setup. Install the fonts and cursor
+theme below separately if desired, and review the default application bindings.
+UWSM is optional; a normal Hyprland session is supported.
+
+The package supplies Hyprland and GTK portal backends. Yonux applies a
+Hyprland-specific `xdg-desktop-portal/hyprland-portals.conf`, selecting Hyprland
+for screen capture and GTK for file selection without changing other desktops.
+After the first installation, start a fresh Hyprland session before testing
+screen sharing. Both plain Hyprland and UWSM-managed sessions are supported.
+If capture fails, inspect `journalctl --user -b -u xdg-desktop-portal
+-u xdg-desktop-portal-hyprland`; a running service alone does not prove that
+capture works. Test source selection and transmitted video in Discord and a
+browser. Applying configuration never interrupts existing shares by restarting
+the portal services.
+
 ### Manual installation
 
 Install these dependencies using your distribution's packages or upstream builds.
@@ -147,21 +200,18 @@ check the main dependencies with `qs --version`, `sensors -j` and `wpctl status`
 Clone the repository and run the installer from its root:
 
 ```sh
-git clone https://github.com/joaocunha50/yonux-shell.git
-cd yonux-shell
+git clone --branch development https://github.com/JoaoCunha50/yonux.git
+cd yonux
 ./install.sh
 ```
 
 The installer needs Go and runs `yonux dev-apply --from <clone root>` from the
 checkout. It builds the `yonux` CLI and the `yonux-ipc` helper into
-`~/.local/bin`, copies `yonux/hypr/` to `~/.config/hypr` and
-`yonux/shell/quickshell/` to `~/.config/quickshell/yonux`, and materializes
-Matugen from the clone. Both config directories are replaced, except
-`~/.config/hypr/user.lua`, which is kept; other configs in `~/.config/quickshell`
-are not touched. After a successful run the clone is recorded as the source, so
-a later `yonux materialize` uses it. The installed files are copies: run
-`./install.sh` again after changing the clone. Applying another clone replaces
-the record; a failed run keeps the previous one.
+`~/.local/bin` and applies Hyprland, Quickshell, Matugen and portal configuration
+through the same composition and backups as `yonux install`. After success the
+clone is recorded as the source; later `yonux apply` reads it. A failed run
+keeps the previous source record. Changes to Go require another `dev-apply`;
+QML and configuration changes need only `yonux apply`.
 The installer supplies the user configuration; packages and services must be
 provided by either the NixOS module or the manual steps above.
 
@@ -269,7 +319,7 @@ Keep Matugen customizations in `user_preferences/matugen/`. `materialize` takes
 the base from `YONUX_BASE` for that run when set, else from the clone recorded by
 `yonux dev-apply`, else from the installed package; a recorded clone that is gone
 is an error. Hyprland's `~/.config/hypr/user.lua` remains a dedicated
-personalization file and is not managed by the Matugen-only `materialize`.
+personalization file and is never owned or overwritten by the composer.
 
 | Application      | Generated output                             |
 | ---------------- | -------------------------------------------- |
@@ -299,9 +349,12 @@ may require adapting the selection. Without a valid reading, the indicator is hi
 
 ## Updating
 
-Pull changes into the checkout to update the linked configuration. If using the
-NixOS flake module, update the `yonux-shell` input and rebuild the system as well.
-Restart the shell or log into a fresh Hyprland session as needed.
+After upgrading the package, run `yonux apply`. For a development checkout,
+pull and run `./install.sh` to rebuild the binaries and apply it.
+Quickshell watches its configuration copies. In an active Hyprland session,
+`install`, `apply` and `dev-apply` pause autoreload during writes, restore its
+previous setting even on failure, and reload once after success if autoreload
+was originally enabled. They do not restart the shell or portals.
 
 ## FAQ
 

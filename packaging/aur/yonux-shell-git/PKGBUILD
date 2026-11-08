@@ -1,0 +1,96 @@
+# Maintainer: Yonux contributors
+pkgname=yonux-shell-git
+pkgver=r62.g533a2b7
+pkgrel=1
+pkgdesc='Hyprland and Quickshell desktop configuration with the Yonux CLI'
+arch=('x86_64')
+url='https://github.com/JoaoCunha50/yonux'
+license=('MIT')
+depends=(
+  'hyprland>=0.57.1'
+  'quickshell>=0.3.2'
+  'matugen>=4.2.0'
+  'networkmanager'
+  'glibc'
+  'pipewire'
+  'wireplumber'
+  'upower'
+  'lm_sensors'
+  'wl-clipboard'
+  'cliphist'
+  'fuzzel'
+  'grim'
+  'slurp'
+  'libnotify'
+  'playerctl'
+  'brightnessctl'
+  'hyprpicker'
+  'hyprsunset'
+  'hyprpolkitagent'
+  'hyprlock'
+  'hypridle'
+  'squashfs-tools'
+  'nautilus'
+  'gvfs'
+  'udisks2'
+  'gnome-keyring'
+  'dconf'
+  'glib2'
+  'adw-gtk-theme'
+  'adwaita-icon-theme'
+  'xdg-terminal-exec'
+  'xdg-desktop-portal'
+  'xdg-desktop-portal-hyprland'
+  'xdg-desktop-portal-gtk'
+)
+makedepends=('git' 'go>=1.26.10')
+optdepends=(
+  'uwsm: optional Hyprland session management'
+  'ghostty: default terminal binding'
+  'flatpak: default Zen Browser binding'
+  'ttf-jetbrains-mono-nerd: configured monospace font'
+  'bibata-cursor-theme: configured cursor theme'
+  'bluez: Bluetooth service'
+  'power-profiles-daemon: power profile service'
+  'gamescope: optional game session integration'
+  'gamemode: optional game performance integration'
+)
+provides=('yonux-shell')
+conflicts=('yonux-shell')
+install=yonux-shell.install
+options=('!debug')
+source=("yonux::git+${url}.git#branch=development")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$srcdir/yonux"
+  printf 'r%s.g%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+build() {
+  export GOTOOLCHAIN=local
+  export CGO_ENABLED=1
+  cd "$srcdir/yonux/yonux/cli"
+  go build -trimpath -buildmode=pie -ldflags="-linkmode=external -extldflags '${LDFLAGS}'" -o "$srcdir/yonux-bin" ./cmd
+  cd "$srcdir/yonux/yonux/shell/ipc"
+  go build -trimpath -buildmode=pie -ldflags="-linkmode=external -extldflags '${LDFLAGS}'" -o "$srcdir/yonux-ipc-bin" ./cmd
+}
+
+package() {
+  install -Dm755 "$srcdir/yonux-bin" "$pkgdir/usr/bin/yonux"
+  install -Dm755 "$srcdir/yonux-ipc-bin" "$pkgdir/usr/bin/yonux-ipc"
+
+  cd "$srcdir/yonux"
+  # Only tracked assets from this checkout: no ignored files or local build output.
+  local file mode
+  while IFS= read -r -d '' file; do
+    case "$file" in
+      yonux/hypr/user.lua|*/.qmlls.ini) continue ;;
+    esac
+    mode=644
+    [[ -x "$file" ]] && mode=755
+    install -Dm"$mode" "$file" "$pkgdir/usr/share/yonux/${file#yonux/}"
+  done < <(git ls-files -z -- yonux/hypr yonux/shell/quickshell yonux/shell/matugen yonux/portals)
+
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

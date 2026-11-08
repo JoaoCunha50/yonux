@@ -1,0 +1,61 @@
+pkgbase = yonux-shell-git
+	pkgdesc = Hyprland and Quickshell desktop configuration with the Yonux CLI
+	pkgver = r62.g533a2b7
+	pkgrel = 1
+	url = https://github.com/JoaoCunha50/yonux
+	install = yonux-shell.install
+	arch = x86_64
+	license = MIT
+	makedepends = git
+	makedepends = go>=1.26.10
+	depends = hyprland>=0.57.1
+	depends = quickshell>=0.3.2
+	depends = matugen>=4.2.0
+	depends = networkmanager
+	depends = glibc
+	depends = pipewire
+	depends = wireplumber
+	depends = upower
+	depends = lm_sensors
+	depends = wl-clipboard
+	depends = cliphist
+	depends = fuzzel
+	depends = grim
+	depends = slurp
+	depends = libnotify
+	depends = playerctl
+	depends = brightnessctl
+	depends = hyprpicker
+	depends = hyprsunset
+	depends = hyprpolkitagent
+	depends = hyprlock
+	depends = hypridle
+	depends = squashfs-tools
+	depends = nautilus
+	depends = gvfs
+	depends = udisks2
+	depends = gnome-keyring
+	depends = dconf
+	depends = glib2
+	depends = adw-gtk-theme
+	depends = adwaita-icon-theme
+	depends = xdg-terminal-exec
+	depends = xdg-desktop-portal
+	depends = xdg-desktop-portal-hyprland
+	depends = xdg-desktop-portal-gtk
+	optdepends = uwsm: optional Hyprland session management
+	optdepends = ghostty: default terminal binding
+	optdepends = flatpak: default Zen Browser binding
+	optdepends = ttf-jetbrains-mono-nerd: configured monospace font
+	optdepends = bibata-cursor-theme: configured cursor theme
+	optdepends = bluez: Bluetooth service
+	optdepends = power-profiles-daemon: power profile service
+	optdepends = gamescope: optional game session integration
+	optdepends = gamemode: optional game performance integration
+	provides = yonux-shell
+	conflicts = yonux-shell
+	options = !debug
+	source = yonux::git+https://github.com/JoaoCunha50/yonux.git#branch=development
+	sha256sums = SKIP
+
+pkgname = yonux-shell-git
