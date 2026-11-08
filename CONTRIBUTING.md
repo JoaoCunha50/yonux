@@ -12,14 +12,21 @@ Feature PRs can be squash merged.
 
 ## Development
 
-Run `./dev.sh` from the checkout. It runs `./install.sh` (re-links the config,
-rebuilds `yonux` and `yonux-ipc` into `~/.local/bin`, materializes) and restarts
-the shell in the foreground with its log on the terminal; Ctrl+C stops it.
-`./dev.sh --build` does the same without touching the running shell.
+Run `./dev.sh` from the clone to run the shell straight from it, in the
+foreground with its log on the terminal. QML edits reload live; for Go changes,
+press Ctrl+C and run it again. It builds `yonux` and `yonux-ipc` into a temp
+dir and composes Matugen there from the clone and your real `user_preferences`;
+it installs and records nothing, and removes the temp dir on exit.
 
-Files under `~/.config/yonux/matugen/` are symlinks into the checkout, so template
-edits apply on the next palette change. Run `./dev.sh --build` again after adding
-a file there or changing Go code.
+While it runs, the installed shell is stopped, and it is started again on exit
+if it was running. `dev.sh` is not a sandbox: it uses your real session and
+preferences, and what you change in it (settings, shortcuts, theme) stays after
+exit. Stop it from another terminal with
+`qs kill -p <clone>/yonux/shell/quickshell`. If it is killed outright
+(`SIGKILL`), start the installed shell again with `qs -c yonux -d`.
+
+To install the clone for normal use, run `./install.sh`
+(`yonux dev-apply --from <clone root>`); see the README.
 
 ## Checks
 

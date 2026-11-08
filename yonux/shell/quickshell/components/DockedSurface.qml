@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Shapes
-import yonux.theme
+import qs.theme
 
 Item {
     id: root

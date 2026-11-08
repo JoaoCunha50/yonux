@@ -1,4 +1,4 @@
-module yonux.modules.bar.tray
+module qs.modules.bar.tray
 TrayAnchor 1.0 TrayAnchor.qml
 TrayArea 1.0 TrayArea.qml
 TrayHover 1.0 TrayHover.qml

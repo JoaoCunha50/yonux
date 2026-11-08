@@ -2,10 +2,10 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.Pipewire
-import yonux.theme
-import yonux.services
-import yonux.components
-import yonux.modules.bar.tray
+import qs.theme
+import qs.services
+import qs.components
+import qs.modules.bar.tray
 
 TrayPopup {
     id: audioPopup

@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls as Controls
-import yonux.theme
+import qs.theme
 
 Controls.TextField {
     id: root

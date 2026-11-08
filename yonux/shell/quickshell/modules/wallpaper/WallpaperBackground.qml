@@ -2,8 +2,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import yonux.theme
-import yonux.services
+import qs.theme
+import qs.services
 
 Variants {
     model: Quickshell.screens

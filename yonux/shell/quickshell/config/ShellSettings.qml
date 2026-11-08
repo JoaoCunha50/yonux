@@ -1,8 +1,8 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import yonux.config
-import yonux.theme
+import qs.config
+import qs.theme
 
 SettingsStore {
     id: root

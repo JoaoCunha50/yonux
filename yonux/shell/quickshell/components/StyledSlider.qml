@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Templates as T
-import yonux.theme
+import qs.theme
 
 T.Slider {
     id: root

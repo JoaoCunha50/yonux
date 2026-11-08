@@ -3,9 +3,9 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Quickshell
-import yonux.theme
-import yonux.services
-import yonux.components
+import qs.theme
+import qs.services
+import qs.components
 
 ColumnLayout {
     id: root

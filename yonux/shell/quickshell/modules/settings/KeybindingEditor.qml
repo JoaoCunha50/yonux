@@ -4,9 +4,9 @@ import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import yonux.components
-import yonux.config
-import yonux.theme
+import qs.components
+import qs.config
+import qs.theme
 
 Controls.Popup {
     id: root

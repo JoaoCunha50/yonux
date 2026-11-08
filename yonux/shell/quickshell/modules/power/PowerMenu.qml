@@ -1,8 +1,8 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import yonux.theme
-import yonux.components
-import yonux.modules.power
+import qs.theme
+import qs.components
+import qs.modules.power
 
 Overlay {
     id: root

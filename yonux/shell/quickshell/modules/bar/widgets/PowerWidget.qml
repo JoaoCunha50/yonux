@@ -1,6 +1,6 @@
 import QtQuick
-import yonux.theme
-import yonux.modules.bar.tray
+import qs.theme
+import qs.modules.bar.tray
 
 TrayItem {
     icon.name: Icons.power

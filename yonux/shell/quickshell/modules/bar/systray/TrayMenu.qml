@@ -2,9 +2,9 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Widgets
-import yonux.theme
-import yonux.components
-import yonux.modules.bar.tray
+import qs.theme
+import qs.components
+import qs.modules.bar.tray
 
 TrayPopup {
     id: root

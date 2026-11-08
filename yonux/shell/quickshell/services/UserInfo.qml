@@ -2,7 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import yonux.services
+import qs.services
 
 Singleton {
     id: root

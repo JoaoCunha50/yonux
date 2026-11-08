@@ -1,8 +1,6 @@
 package materialize
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/fs"
@@ -11,6 +9,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"joaocunha50/yonux-cli/internal/source"
 )
 
 type tree struct {
@@ -27,21 +27,42 @@ type Layout struct {
 	Base   string // path to the yonux folder
 	Config string // $XDG_CONFIG_HOME
 	State  string // $XDG_STATE_HOME/yonux, where the manifest lives
-	Link   bool   // dev mode - symlink into Base instead of copying
 }
 
-func DefaultLayout() (Layout, error) {
+// UserLayout is the user's config and state dirs, without a Base.
+func UserLayout() (Layout, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return Layout{}, err
 	}
-
-	l := Layout{
+	return Layout{
 		Config: envOr("XDG_CONFIG_HOME", filepath.Join(home, ".config")),
 		State:  filepath.Join(envOr("XDG_STATE_HOME", filepath.Join(home, ".local", "state")), "yonux"),
+	}, nil
+}
+
+// DefaultLayout picks the base: $YONUX_BASE for this run, else the checkout
+// recorded by `yonux dev-apply`, else the installed ../share/yonux beside the
+// real executable. A recorded checkout that is gone is an error, never a fallback.
+func DefaultLayout() (Layout, error) {
+	l, err := UserLayout()
+	if err != nil {
+		return Layout{}, err
 	}
 	if base := os.Getenv("YONUX_BASE"); base != "" {
-		l.Base, l.Link = base, true
+		l.Base = base
+		return l, nil
+	}
+
+	s, err := source.Load(l.State)
+	if err != nil {
+		return Layout{}, err
+	}
+	if s.Checkout != "" {
+		l.Base = filepath.Join(s.Checkout, "yonux")
+		if info, err := os.Stat(l.Base); err != nil || !info.IsDir() {
+			return Layout{}, fmt.Errorf("registered checkout %s not found (recorded by yonux dev-apply)", l.Base)
+		}
 		return l, nil
 	}
 
@@ -49,7 +70,6 @@ func DefaultLayout() (Layout, error) {
 	if err != nil {
 		return Layout{}, err
 	}
-
 	exe, _ = filepath.EvalSymlinks(exe)
 	l.Base = filepath.Join(filepath.Dir(exe), "..", "share", "yonux")
 	return l, nil
@@ -66,8 +86,8 @@ func (l Layout) Preferences() string {
 	return filepath.Join(l.Config, "yonux", "user_preferences")
 }
 
-// manifest maps each laid path (relative to Config) to the hash of what was laid there, or "" for a symlink.
-type manifest map[string]string
+// manifest lists each laid path, relative to Config.
+type manifest []string
 
 func (l Layout) manifestPath() string { return filepath.Join(l.State, "materialize.json") }
 
@@ -84,7 +104,7 @@ func (l Layout) readManifest() (manifest, error) {
 		return nil, fmt.Errorf("decode manifest: %w", err)
 	}
 	if m == nil {
-		return nil, fmt.Errorf("decode manifest: expected an object, got null")
+		return nil, fmt.Errorf("decode manifest: expected a list, got null")
 	}
 	if err := validateManifest(m); err != nil {
 		return nil, err
@@ -93,7 +113,7 @@ func (l Layout) readManifest() (manifest, error) {
 }
 
 func validateManifest(m manifest) error {
-	for key := range m {
+	for _, key := range m {
 		managed := false
 		if !path.IsAbs(key) && path.Clean(key) == key {
 			for _, t := range trees {
@@ -122,7 +142,7 @@ func (l Layout) writeManifest(m manifest) error {
 }
 
 // Materialize lays everything on to ~/.config
-//  1. each shipped file is copied (or linked, in dev) over the live one;
+//  1. each shipped file is copied over the live one;
 //  2. a file in user_preferences wins over the shipped one, and can add files
 //     the base does not ship;
 //  3. edits to live files are overwritten, never saved into user_preferences;
@@ -130,13 +150,14 @@ func (l Layout) writeManifest(m manifest) error {
 //     even if their live contents were edited.
 func Materialize(l Layout) error {
 	if info, err := os.Stat(l.Base); err != nil || !info.IsDir() {
-		return fmt.Errorf("base dir not found: %s (set YONUX_BASE to the repo's yonux/ folder in dev)", l.Base)
+		return fmt.Errorf("base dir not found: %s", l.Base)
 	}
 	prev, err := l.readManifest()
 	if err != nil {
 		return err
 	}
 	next := manifest{}
+	laid := map[string]bool{}
 
 	for _, t := range trees {
 		src := filepath.Join(l.Base, t.Src)
@@ -147,35 +168,23 @@ func Materialize(l Layout) error {
 		}
 		for _, rel := range rels {
 			key := filepath.ToSlash(filepath.Join(t.Dst, rel))
-			dst := filepath.Join(l.Config, t.Dst, rel)
-			pref := filepath.Join(prefs, rel)
-			shipped := filepath.Join(src, rel)
-
-			from, link := shipped, l.Link
-			if exists(pref) {
-				from, link = pref, false
+			from := filepath.Join(src, rel)
+			if pref := filepath.Join(prefs, rel); exists(pref) {
+				from = pref
 			}
-
-			if link {
-				if err := linkFile(from, dst); err != nil {
-					return fmt.Errorf("link %s: %w", key, err)
-				}
-				next[key] = ""
-				continue
-			}
-			h, err := copyFile(from, dst)
-			if err != nil {
+			if err := copyFile(from, filepath.Join(l.Config, t.Dst, rel)); err != nil {
 				return fmt.Errorf("copy %s: %w", key, err)
 			}
-			next[key] = h
+			next = append(next, key)
+			laid[key] = true
 		}
 	}
 
 	for _, t := range trees {
 		root := filepath.Join(l.Config, t.Dst)
 		prefix := filepath.ToSlash(t.Dst) + "/"
-		for key := range prev {
-			if _, ok := next[key]; ok || !strings.HasPrefix(key, prefix) {
+		for _, key := range prev {
+			if laid[key] || !strings.HasPrefix(key, prefix) {
 				continue
 			}
 			rel := filepath.FromSlash(strings.TrimPrefix(key, prefix))
@@ -184,6 +193,7 @@ func Materialize(l Layout) error {
 		}
 	}
 
+	sort.Strings(next)
 	if err := l.writeManifest(next); err != nil {
 		return fmt.Errorf("record manifest: %w", err)
 	}
@@ -225,63 +235,41 @@ func exists(p string) bool {
 	return err == nil
 }
 
-func hashBytes(b []byte) string {
-	sum := sha256.Sum256(b)
-	return hex.EncodeToString(sum[:])
-}
-
 // copyFile writes through a temp file and a rename, so a symlink at dst is
-// replaced instead of written through (in dev it would point into the repo).
-func copyFile(src, dst string) (string, error) {
+// replaced instead of written through (it may point into a clone).
+func copyFile(src, dst string) error {
 	b, err := os.ReadFile(src)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	info, err := os.Stat(src)
 	if err != nil {
-		return "", err
+		return err
 	}
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-		return "", err
+		return err
 	}
 
 	tmp, err := os.CreateTemp(filepath.Dir(dst), ".yonux-*")
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	defer os.Remove(tmp.Name())
 	if _, err := tmp.Write(b); err != nil {
 		tmp.Close()
-		return "", err
+		return err
 	}
 	if err := tmp.Chmod(info.Mode().Perm()); err != nil {
 		tmp.Close()
-		return "", err
+		return err
 	}
 	if err := tmp.Close(); err != nil {
-		return "", err
-	}
-
-	return hashBytes(b), os.Rename(tmp.Name(), dst)
-}
-
-func linkFile(src, dst string) error {
-	if cur, err := os.Readlink(dst); err == nil && cur == src {
-		return nil
-	}
-	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 		return err
 	}
 
-	tmp := dst + ".yonux-link"
-	_ = os.Remove(tmp)
-	if err := os.Symlink(src, tmp); err != nil {
-		return err
-	}
-
-	return os.Rename(tmp, dst)
+	return os.Rename(tmp.Name(), dst)
 }
 
 func pruneEmptyParents(root, dir string) {

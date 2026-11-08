@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import yonux.theme
+import qs.theme
 
 RowLayout {
     id: root

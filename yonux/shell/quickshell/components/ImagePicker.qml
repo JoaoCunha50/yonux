@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import Qt.labs.folderlistmodel
-import yonux.theme
+import qs.theme
 
 Controls.Popup {
     id: root

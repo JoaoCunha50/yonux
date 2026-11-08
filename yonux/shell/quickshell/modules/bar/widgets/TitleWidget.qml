@@ -1,8 +1,8 @@
 import QtQuick
 import Quickshell.Hyprland
-import yonux.theme
-import yonux.components
-import yonux.modules.bar.tray
+import qs.theme
+import qs.components
+import qs.modules.bar.tray
 
 TrayItem {
     fillWidth: true

@@ -1,4 +1,4 @@
-module yonux.config
+module qs.config
 singleton HyprSettings 1.0 HyprSettings.qml
 JsonConfig 1.0 JsonConfig.qml
 JsonFile 1.0 JsonFile.qml

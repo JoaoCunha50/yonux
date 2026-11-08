@@ -2,8 +2,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import yonux.theme
-import yonux.components
+import qs.theme
+import qs.components
 
 PanelWindow { // qmllint disable uncreatable-type
     id: root

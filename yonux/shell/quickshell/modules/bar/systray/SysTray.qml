@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell.Services.SystemTray
-import yonux.theme
+import qs.theme
 
 Rectangle {
     id: root

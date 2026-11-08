@@ -1,5 +1,5 @@
 import QtQuick
-import yonux.theme
+import qs.theme
 
 Text {
     renderType: Text.NativeRendering

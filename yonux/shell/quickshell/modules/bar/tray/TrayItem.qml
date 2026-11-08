@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import yonux.theme
-import yonux.components
+import qs.theme
+import qs.components
 
 ShellButton {
     id: root

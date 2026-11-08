@@ -4,10 +4,10 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtQuick.Controls as Controls
 import Quickshell
-import yonux.theme
-import yonux.config
-import yonux.services
-import yonux.components
+import qs.theme
+import qs.config
+import qs.services
+import qs.components
 
 FloatingWindow { // qmllint disable uncreatable-type
     id: root

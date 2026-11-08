@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
-import yonux.components
-import yonux.theme
+import qs.components
+import qs.theme
 
 Rectangle {
     id: root

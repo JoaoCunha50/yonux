@@ -1,7 +1,7 @@
-import yonux.modules.bar
+import qs.modules.bar
 import QtQuick
-import yonux.theme
-import yonux.modules.bar.tray
+import qs.theme
+import qs.modules.bar.tray
 
 Rectangle {
     id: bar

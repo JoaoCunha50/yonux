@@ -3,9 +3,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
-import yonux.config
-import yonux.services
-import yonux.theme
+import qs.config
+import qs.services
+import qs.theme
 
 PanelWindow { // qmllint disable uncreatable-type
     id: root

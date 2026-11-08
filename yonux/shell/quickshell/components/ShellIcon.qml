@@ -1,6 +1,6 @@
 import QtQuick
-import yonux.theme
-import yonux.components
+import qs.theme
+import qs.components
 
 Text {
     property IconProps icon: IconProps {

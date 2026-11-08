@@ -1,7 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import yonux.config
+import qs.config
 
 Singleton {
     id: root

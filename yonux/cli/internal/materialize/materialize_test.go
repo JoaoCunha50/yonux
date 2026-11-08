@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"joaocunha50/yonux-cli/internal/source"
 )
 
 func TestMaterializeRejectsPathsOutsideManagedTreesBeforeChangingFiles(t *testing.T) {
@@ -17,14 +19,14 @@ func TestMaterializeRejectsPathsOutsideManagedTreesBeforeChangingFiles(t *testin
 		"yonux/matugen//file", "yonux/matugen/./file",
 	} {
 		t.Run(key, func(t *testing.T) {
-			l := layout(t, false)
+			l := layout(t)
 			live := filepath.Join(l.Config, "yonux/matugen/config.toml")
 			obsolete := filepath.Join(l.Config, "yonux/matugen/obsolete")
 			unrelated := filepath.Join(l.Config, "fish/config.fish")
 			write(t, live, "active original")
 			write(t, obsolete, "stale original")
 			write(t, unrelated, "unrelated original")
-			body, err := json.Marshal(map[string]string{key: "", "yonux/matugen/obsolete": ""})
+			body, err := json.Marshal([]string{key, "yonux/matugen/obsolete"})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -48,9 +50,9 @@ func TestMaterializeRejectsPathsOutsideManagedTreesBeforeChangingFiles(t *testin
 }
 
 func TestMaterializeRejectsUnreadableOrInvalidManifest(t *testing.T) {
-	for _, body := range []string{"", "{", "null", "[]", `{"yonux/matugen/config.toml":123}`} {
+	for _, body := range []string{"", "{", "null", "{}", `[123]`} {
 		t.Run(body, func(t *testing.T) {
-			l := layout(t, false)
+			l := layout(t)
 			live := filepath.Join(l.Config, "yonux/matugen/config.toml")
 			write(t, live, "unchanged")
 			write(t, l.manifestPath(), body)
@@ -67,7 +69,7 @@ func TestMaterializeRejectsUnreadableOrInvalidManifest(t *testing.T) {
 		})
 	}
 	t.Run("read_error", func(t *testing.T) {
-		l := layout(t, false)
+		l := layout(t)
 		live := filepath.Join(l.Config, "yonux/matugen/config.toml")
 		write(t, live, "unchanged")
 		if err := os.MkdirAll(l.manifestPath(), 0o755); err != nil {
@@ -101,13 +103,12 @@ func read(t *testing.T, p string) string {
 	return string(b)
 }
 
-func layout(t *testing.T, link bool) Layout {
+func layout(t *testing.T) Layout {
 	dir := t.TempDir()
 	l := Layout{
 		Base:   filepath.Join(dir, "base"),
 		Config: filepath.Join(dir, "config"),
 		State:  filepath.Join(dir, "state"),
-		Link:   link,
 	}
 	write(t, filepath.Join(l.Base, "shell/matugen/config.toml"), "base config")
 	write(t, filepath.Join(l.Base, "shell/matugen/templates/fish"), "base fish")
@@ -122,7 +123,7 @@ func mustMaterialize(t *testing.T, l Layout) {
 }
 
 func TestMaterializeCopiesAndUpdates(t *testing.T) {
-	l := layout(t, false)
+	l := layout(t)
 	live := filepath.Join(l.Config, "yonux/matugen/config.toml")
 
 	mustMaterialize(t, l)
@@ -138,7 +139,7 @@ func TestMaterializeCopiesAndUpdates(t *testing.T) {
 }
 
 func TestMaterializePreferenceWins(t *testing.T) {
-	l := layout(t, false)
+	l := layout(t)
 	write(t, filepath.Join(l.Preferences(), "matugen/config.toml"), "mine")
 	write(t, filepath.Join(l.Preferences(), "matugen/templates/extra"), "extra")
 
@@ -162,32 +163,24 @@ func TestMaterializePreferenceWins(t *testing.T) {
 }
 
 func TestMaterializeOverwritesHandEdits(t *testing.T) {
-	for _, link := range []bool{false, true} {
-		t.Run(map[bool]string{false: "copy", true: "dev_link"}[link], func(t *testing.T) {
-			l := layout(t, link)
-			live := filepath.Join(l.Config, "yonux/matugen/config.toml")
-			mustMaterialize(t, l)
+	l := layout(t)
+	live := filepath.Join(l.Config, "yonux/matugen/config.toml")
+	mustMaterialize(t, l)
 
-			// Replace the active entry so a dev symlink does not edit the base.
-			if err := os.Remove(live); err != nil {
-				t.Fatal(err)
-			}
-			write(t, live, "hand edit")
-			write(t, filepath.Join(l.Base, "shell/matugen/config.toml"), "new base")
-			mustMaterialize(t, l)
+	write(t, live, "hand edit")
+	write(t, filepath.Join(l.Base, "shell/matugen/config.toml"), "new base")
+	mustMaterialize(t, l)
 
-			if got := read(t, live); got != "new base" {
-				t.Fatalf("active edit was not replaced: %q", got)
-			}
-			if _, err := os.Lstat(l.Preferences()); !os.IsNotExist(err) {
-				t.Fatalf("active edit created preferences: %v", err)
-			}
-		})
+	if got := read(t, live); got != "new base" {
+		t.Fatalf("active edit was not replaced: %q", got)
+	}
+	if _, err := os.Lstat(l.Preferences()); !os.IsNotExist(err) {
+		t.Fatalf("active edit created preferences: %v", err)
 	}
 }
 
 func TestMaterializePrunesDroppedFiles(t *testing.T) {
-	l := layout(t, false)
+	l := layout(t)
 	mustMaterialize(t, l)
 
 	write(t, filepath.Join(l.Config, "yonux/matugen/templates/fish"), "hand edit")
@@ -204,7 +197,7 @@ func TestMaterializePrunesDroppedFiles(t *testing.T) {
 }
 
 func TestMaterializePruningKeepsManagedRootAndAncestors(t *testing.T) {
-	l := layout(t, false)
+	l := layout(t)
 	mustMaterialize(t, l)
 	if err := os.RemoveAll(filepath.Join(l.Base, "shell/matugen")); err != nil {
 		t.Fatal(err)
@@ -222,50 +215,132 @@ func TestMaterializePruningKeepsManagedRootAndAncestors(t *testing.T) {
 }
 
 func TestMaterializeRestoresPreferencesOverActiveEdits(t *testing.T) {
-	for _, link := range []bool{false, true} {
-		t.Run(map[bool]string{false: "copy", true: "dev_link"}[link], func(t *testing.T) {
-			l := layout(t, link)
-			pref := filepath.Join(l.Preferences(), "matugen/config.toml")
-			live := filepath.Join(l.Config, "yonux/matugen/config.toml")
-			write(t, pref, "my preferences")
-			mustMaterialize(t, l)
+	l := layout(t)
+	pref := filepath.Join(l.Preferences(), "matugen/config.toml")
+	live := filepath.Join(l.Config, "yonux/matugen/config.toml")
+	write(t, pref, "my preferences")
+	mustMaterialize(t, l)
 
-			write(t, live, "active edit")
-			mustMaterialize(t, l)
-			if got := read(t, live); got != "my preferences" {
-				t.Fatalf("preferences did not replace active edit: %q", got)
-			}
-			if got := read(t, pref); got != "my preferences" {
-				t.Fatalf("preferences were modified: %q", got)
-			}
-			if got := read(t, filepath.Join(l.Base, "shell/matugen/config.toml")); got != "base config" {
-				t.Fatalf("base was modified: %q", got)
-			}
-		})
+	write(t, live, "active edit")
+	mustMaterialize(t, l)
+	if got := read(t, live); got != "my preferences" {
+		t.Fatalf("preferences did not replace active edit: %q", got)
+	}
+	if got := read(t, pref); got != "my preferences" {
+		t.Fatalf("preferences were modified: %q", got)
+	}
+	if got := read(t, filepath.Join(l.Base, "shell/matugen/config.toml")); got != "base config" {
+		t.Fatalf("base was modified: %q", got)
 	}
 }
 
-func TestMaterializeLinkMode(t *testing.T) {
-	l := layout(t, true)
+// A live file that is a symlink into a clone (the old dev install) becomes a
+// copy, and the clone is never written through.
+func TestMaterializeReplacesSymlinkWithCopy(t *testing.T) {
+	l := layout(t)
+	shipped := filepath.Join(l.Base, "shell/matugen/config.toml")
 	live := filepath.Join(l.Config, "yonux/matugen/config.toml")
-	write(t, filepath.Join(l.Preferences(), "matugen/templates/fish"), "my fish")
+	if err := os.MkdirAll(filepath.Dir(live), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(shipped, live); err != nil {
+		t.Fatal(err)
+	}
+	write(t, filepath.Join(l.Preferences(), "matugen/config.toml"), "mine")
 
 	mustMaterialize(t, l)
-	target, err := os.Readlink(live)
-	if err != nil || target != filepath.Join(l.Base, "shell/matugen/config.toml") {
-		t.Fatalf("not linked into base: %q %v", target, err)
+	if info, err := os.Lstat(live); err != nil || !info.Mode().IsRegular() {
+		t.Fatalf("live file is not a regular copy: %v", err)
 	}
+	if got := read(t, live); got != "mine" {
+		t.Fatalf("live = %q", got)
+	}
+	if got := read(t, shipped); got != "base config" {
+		t.Fatalf("materialize wrote through into the clone: %q", got)
+	}
+}
 
-	write(t, filepath.Join(l.Base, "shell/matugen/config.toml"), "edited in repo")
-	if got := read(t, live); got != "edited in repo" {
-		t.Fatalf("repo edit not live: %q", got)
+func TestMaterializeRecordsLaidPaths(t *testing.T) {
+	l := layout(t)
+	mustMaterialize(t, l)
+	var got []string
+	if err := json.Unmarshal([]byte(read(t, l.manifestPath())), &got); err != nil {
+		t.Fatal(err)
 	}
+	want := []string{"yonux/matugen/config.toml", "yonux/matugen/templates/fish"}
+	if strings.Join(got, ",") != strings.Join(want, ",") {
+		t.Fatalf("manifest = %v, want %v", got, want)
+	}
+}
 
-	fish := filepath.Join(l.Config, "yonux/matugen/templates/fish")
-	if info, _ := os.Lstat(fish); info.Mode()&os.ModeSymlink != 0 {
-		t.Fatal("preference should be a copy, not a link")
+func userDirs(t *testing.T) (state string) {
+	dir := t.TempDir()
+	t.Setenv("HOME", dir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(dir, "config"))
+	t.Setenv("XDG_STATE_HOME", filepath.Join(dir, "state"))
+	t.Setenv("YONUX_BASE", "")
+	return filepath.Join(dir, "state", "yonux")
+}
+
+func registerClone(t *testing.T, state string) string {
+	clone := filepath.Join(t.TempDir(), "clone")
+	if err := os.MkdirAll(filepath.Join(clone, "yonux"), 0o755); err != nil {
+		t.Fatal(err)
 	}
-	if got := read(t, filepath.Join(l.Base, "shell/matugen/templates/fish")); got != "base fish" {
-		t.Fatalf("preference wrote through into the repo: %q", got)
+	if err := source.Save(state, source.Source{Checkout: clone}); err != nil {
+		t.Fatal(err)
+	}
+	return clone
+}
+
+func TestDefaultLayoutBaseOverrideWinsForOneRun(t *testing.T) {
+	state := userDirs(t)
+	registerClone(t, state)
+	t.Setenv("YONUX_BASE", "/tmp/override/yonux")
+
+	l, err := DefaultLayout()
+	if err != nil || l.Base != "/tmp/override/yonux" {
+		t.Fatalf("Base = %q, %v", l.Base, err)
+	}
+	if s, _ := source.Load(state); s.Checkout == "/tmp/override" {
+		t.Fatal("YONUX_BASE changed the recorded checkout")
+	}
+}
+
+func TestDefaultLayoutUsesRegisteredCheckout(t *testing.T) {
+	state := userDirs(t)
+	clone := registerClone(t, state)
+
+	l, err := DefaultLayout()
+	if err != nil || l.Base != filepath.Join(clone, "yonux") {
+		t.Fatalf("Base = %q, %v", l.Base, err)
+	}
+	if l.State != state {
+		t.Fatalf("State = %q", l.State)
+	}
+}
+
+func TestDefaultLayoutFailsWhenRegisteredCheckoutIsGone(t *testing.T) {
+	state := userDirs(t)
+	clone := registerClone(t, state)
+	if err := os.RemoveAll(clone); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := DefaultLayout(); err == nil || !strings.Contains(err.Error(), clone) {
+		t.Fatalf("expected an error naming %s, got %v", clone, err)
+	}
+}
+
+func TestDefaultLayoutFallsBackToInstalledShare(t *testing.T) {
+	userDirs(t)
+	exe, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	exe, _ = filepath.EvalSymlinks(exe)
+
+	l, err := DefaultLayout()
+	if err != nil || l.Base != filepath.Join(filepath.Dir(exe), "..", "share", "yonux") {
+		t.Fatalf("Base = %q, %v", l.Base, err)
 	}
 }

@@ -50,6 +50,10 @@ func ParseScheme(name string) (MatugenScheme, error) {
 }
 
 func MatugenConfig() (string, error) {
+	// Environment variable for dev.sh mode.
+	if p := os.Getenv("YONUX_MATUGEN_CONFIG"); p != "" {
+		return p, nil
+	}
 	dir := os.Getenv("XDG_CONFIG_HOME")
 	if dir == "" {
 		home, err := os.UserHomeDir()

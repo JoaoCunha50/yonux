@@ -1,9 +1,9 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import yonux.components
-import yonux.services
-import yonux.theme
+import qs.components
+import qs.services
+import qs.theme
 
 ColumnLayout {
     id: root

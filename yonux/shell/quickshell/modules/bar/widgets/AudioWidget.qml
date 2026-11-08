@@ -1,8 +1,8 @@
 import QtQuick
-import yonux.theme
-import yonux.services
-import yonux.modules.bar.tray
-import yonux.modules.bar.popups
+import qs.theme
+import qs.services
+import qs.modules.bar.tray
+import qs.modules.bar.popups
 
 TrayItem {
     acceptedButtons: Qt.LeftButton | Qt.MiddleButton

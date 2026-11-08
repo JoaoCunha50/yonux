@@ -2,9 +2,9 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import yonux.theme
-import yonux.config
-import yonux.components
+import qs.theme
+import qs.config
+import qs.components
 
 Rectangle {
     id: root

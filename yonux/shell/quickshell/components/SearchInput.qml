@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls as Controls
-import yonux.theme
+import qs.theme
 
 StyledTextField {
     id: root

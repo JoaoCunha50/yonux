@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
-import yonux.components
-import yonux.modules.settings
+import qs.components
+import qs.modules.settings
 
 // qmllint disable unresolved-type
 Scope {

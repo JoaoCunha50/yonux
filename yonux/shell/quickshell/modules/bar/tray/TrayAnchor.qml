@@ -1,8 +1,8 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
-import yonux.components
-import yonux.theme
+import qs.components
+import qs.theme
 
 Item {
     id: root

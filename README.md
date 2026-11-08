@@ -138,10 +138,10 @@ To match the remaining NixOS desktop integrations, also configure Bluetooth
 (BlueZ), power-profiles-daemon, AppImage support, Gamescope and GameMode. `btop`
 is included by the NixOS module as a manual monitoring utility.
 
-Continue with **Link the configuration** below, then log into Hyprland. You can
+Continue with **Apply the configuration** below, then log into Hyprland. You can
 check the main dependencies with `qs --version`, `sensors -j` and `wpctl status`.
 
-### Link the configuration
+### Apply the configuration
 
 Clone the repository and run the installer from its root:
 
@@ -151,12 +151,16 @@ cd yonux-shell
 ./install.sh
 ```
 
-The installer links `yonux/hypr/` to `~/.config/hypr` and `yonux/shell/quickshell/` to
-`~/.config/quickshell/yonux`. Existing directories or files are moved to
-`*.bak-<timestamp>`; existing symlinks are replaced. It then builds the `yonux`
-CLI and the `yonux-ipc` helper into `~/.local/bin` (requires Go) and runs
-`yonux materialize`, which links each file of `yonux/shell/matugen/` into
-`~/.config/yonux/matugen/`. Keep the checkout in place.
+The installer needs Go and runs `yonux dev-apply --from <clone root>` from the
+checkout. It builds the `yonux` CLI and the `yonux-ipc` helper into
+`~/.local/bin`, copies `yonux/hypr/` to `~/.config/hypr` and
+`yonux/shell/quickshell/` to `~/.config/quickshell/yonux`, and materializes
+Matugen from the clone. Both config directories are replaced, except
+`~/.config/hypr/user.lua`, which is kept; other configs in `~/.config/quickshell`
+are not touched. After a successful run the clone is recorded as the source, so
+a later `yonux materialize` uses it. The installed files are copies: run
+`./install.sh` again after changing the clone. Applying another clone replaces
+the record; a failed run keeps the previous one.
 The installer supplies the user configuration; packages and services must be
 provided by either the NixOS module or the manual steps above.
 
@@ -169,14 +173,8 @@ other applications yourself or change their bindings.
 Start a Hyprland session to launch the shell automatically, or run:
 
 ```sh
-QML_IMPORT_PATH=~/.config/quickshell qs -c yonux
+qs -c yonux
 ```
-
-Each shell folder is a QML module named after its path (`import yonux.theme`,
-`import yonux.modules.bar`), declared by the `qmldir` file in that folder. Qt
-finds them through the `~/.config/quickshell/yonux` link, so `~/.config/quickshell`
-must be on `QML_IMPORT_PATH`; the Hyprland autostart sets it. Add new QML files
-to their folder's `qmldir`, and give a new folder its own `qmldir`.
 
 Set or query the wallpaper through IPC:
 
@@ -234,8 +232,8 @@ are saved under `$XDG_CONFIG_HOME/yonux` (normally `~/.config/yonux`):
 | `hypr.json`    | Hyprland preferences        |
 | `hyprland.lua` | Generated Hyprland settings |
 
-Put machine-specific Hyprland overrides in `yonux/hypr/user.lua`. This file is ignored
-by Git and loaded last, after generated settings.
+Put machine-specific Hyprland overrides in `~/.config/hypr/user.lua`. It is
+loaded last, after generated settings, and `./install.sh` keeps it.
 
 ### Colours
 
@@ -252,11 +250,11 @@ to get the default back. Files in `~/.config/yonux/matugen/` are managed output:
 them when neither source exists, even if the active file was edited. It never
 copies those edits into `user_preferences`.
 
-Keep Matugen customizations in `user_preferences/matugen/`. In development,
-editing an active symlink edits the checkout itself; edit the checkout for base
-development or use preferences for personal overrides. Hyprland's
-`~/.config/hypr/user.lua` remains a dedicated personalization file and is not
-managed by the current Matugen-only `materialize`.
+Keep Matugen customizations in `user_preferences/matugen/`. `materialize` takes
+the base from `YONUX_BASE` for that run when set, else from the clone recorded by
+`yonux dev-apply`, else from the installed package; a recorded clone that is gone
+is an error. Hyprland's `~/.config/hypr/user.lua` remains a dedicated
+personalization file and is not managed by the Matugen-only `materialize`.
 
 | Application      | Generated output                             |
 | ---------------- | -------------------------------------------- |

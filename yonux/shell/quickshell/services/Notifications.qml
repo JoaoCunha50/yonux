@@ -4,8 +4,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Notifications
-import yonux.config
-import yonux.services
+import qs.config
+import qs.services
 
 Singleton {
     id: root

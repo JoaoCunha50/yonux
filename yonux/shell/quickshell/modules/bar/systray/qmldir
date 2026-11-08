@@ -1,4 +1,4 @@
-module yonux.modules.bar.systray
+module qs.modules.bar.systray
 SysTrayButton 1.0 SysTrayButton.qml
 SysTray 1.0 SysTray.qml
 TrayMenu 1.0 TrayMenu.qml

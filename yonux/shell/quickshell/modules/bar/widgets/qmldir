@@ -1,4 +1,4 @@
-module yonux.modules.bar.widgets
+module qs.modules.bar.widgets
 AudioWidget 1.0 AudioWidget.qml
 BatteryWidget 1.0 BatteryWidget.qml
 ClockWidget 1.0 ClockWidget.qml

@@ -1,7 +1,7 @@
 import QtQuick
-import yonux.theme
-import yonux.services
-import yonux.modules.bar.tray
+import qs.theme
+import qs.services
+import qs.modules.bar.tray
 
 TrayItem {
     icon.name: Icons.cpu

@@ -1,15 +1,15 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import yonux.theme
-import yonux.config
-import yonux.modules.bar
-import yonux.modules.launcher
-import yonux.modules.notifications
-import yonux.modules.power
-import yonux.modules.controlcenter
-import yonux.modules.wallpaper
-import yonux.modules.settings
+import qs.theme
+import qs.config
+import qs.modules.bar
+import qs.modules.launcher
+import qs.modules.notifications
+import qs.modules.power
+import qs.modules.controlcenter
+import qs.modules.wallpaper
+import qs.modules.settings
 
 ShellRoot {
     Component.onCompleted: Keybindings.refresh()

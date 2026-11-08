@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
-import yonux.theme
+import qs.theme
 
 T.ComboBox {
     id: root

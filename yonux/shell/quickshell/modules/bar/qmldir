@@ -1,4 +1,4 @@
-module yonux.modules.bar
+module qs.modules.bar
 singleton BarLayout 1.0 BarLayout.qml
 singleton BarModel 1.0 BarModel.qml
 Bar 1.0 Bar.qml

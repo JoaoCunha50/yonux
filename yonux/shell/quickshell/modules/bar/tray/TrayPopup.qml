@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
-import yonux.theme
-import yonux.components
+import qs.theme
+import qs.components
 
 PopupWindow {
     id: root

@@ -1,4 +1,4 @@
-module yonux.components
+module qs.components
 DockedSurface 1.0 DockedSurface.qml
 IconProps 1.0 IconProps.qml
 ImagePicker 1.0 ImagePicker.qml

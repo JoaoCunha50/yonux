@@ -1,2 +1,2 @@
-module yonux.modules.bar.popups
+module qs.modules.bar.popups
 AudioPopup 1.0 AudioPopup.qml

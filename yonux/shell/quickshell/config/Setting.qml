@@ -1,5 +1,5 @@
 import QtQuick
-import yonux.config
+import qs.config
 
 QtObject {
     id: root

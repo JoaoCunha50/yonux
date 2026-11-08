@@ -2,10 +2,10 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
-import yonux.theme
-import yonux.services
-import yonux.modules.bar
-import yonux.modules.bar.widgets
+import qs.theme
+import qs.services
+import qs.modules.bar
+import qs.modules.bar.widgets
 
 Singleton {
     id: root

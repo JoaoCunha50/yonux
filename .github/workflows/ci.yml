@@ -56,5 +56,5 @@ jobs:
       - name: Check QML
         run: |
           mkdir -p "$RUNNER_TEMP/qml"
-          ln -s "$PWD/yonux/shell/quickshell" "$RUNNER_TEMP/qml/yonux"
+          ln -s "$PWD/yonux/shell/quickshell" "$RUNNER_TEMP/qml/qs"
           find "$PWD/yonux/shell/quickshell" \( -name '*.qml' -o -name '*.js' \) -print0 | nix develop .#ci --no-write-lock-file --command xargs -0 -r qmllint -E -I "$RUNNER_TEMP/qml"

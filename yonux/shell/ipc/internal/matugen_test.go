@@ -57,3 +57,16 @@ func TestChangeShellTheme(t *testing.T) {
 		t.Fatalf("matugen args = %q", got)
 	}
 }
+
+func TestMatugenConfig(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", "/home/me/.config")
+	t.Setenv("YONUX_MATUGEN_CONFIG", "")
+	if got, err := MatugenConfig(); err != nil || got != "/home/me/.config/yonux/matugen/config.toml" {
+		t.Fatalf("MatugenConfig() = %q, %v", got, err)
+	}
+
+	t.Setenv("YONUX_MATUGEN_CONFIG", "/run/user/1000/yonux-dev.x/config/yonux/matugen/config.toml")
+	if got, err := MatugenConfig(); err != nil || got != "/run/user/1000/yonux-dev.x/config/yonux/matugen/config.toml" {
+		t.Fatalf("dev MatugenConfig() = %q, %v", got, err)
+	}
+}

@@ -1,4 +1,4 @@
-module yonux.services
+module qs.services
 singleton Alerts 1.0 Alerts.qml
 singleton Audio 1.0 Audio.qml
 singleton GameMode 1.0 GameMode.qml

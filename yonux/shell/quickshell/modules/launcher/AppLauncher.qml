@@ -3,9 +3,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import yonux.theme
-import yonux.components
-import yonux.config
+import qs.theme
+import qs.components
+import qs.config
 
 Overlay {
     id: root

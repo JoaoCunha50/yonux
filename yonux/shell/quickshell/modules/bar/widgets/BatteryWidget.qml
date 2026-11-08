@@ -1,8 +1,8 @@
 import QtQuick
 import Quickshell.Services.UPower
-import yonux.theme
-import yonux.services
-import yonux.modules.bar.tray
+import qs.theme
+import qs.services
+import qs.modules.bar.tray
 
 TrayItem {
     readonly property int pct: SystemStats.batteryPercent

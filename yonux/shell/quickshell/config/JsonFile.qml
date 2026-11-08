@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import yonux.services
+import qs.services
 
 Scope {
     id: root
