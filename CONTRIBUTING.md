@@ -10,11 +10,22 @@ changes from `development` to `main` for a release. Temporary release branches
 are available when necessary; versions and release candidates are discretionary.
 Feature PRs can be squash merged.
 
+## Development
+
+Run `./dev.sh` from the checkout. It runs `./install.sh` (re-links the config,
+rebuilds `yonux` and `yonux-ipc` into `~/.local/bin`, materializes) and restarts
+the shell in the foreground with its log on the terminal; Ctrl+C stops it.
+`./dev.sh --build` does the same without touching the running shell.
+
+Files under `~/.config/yonux/matugen/` are symlinks into the checkout, so template
+edits apply on the next palette change. Run `./dev.sh --build` again after adding
+a file there or changing Go code.
+
 ## Checks
 
 The required GitHub check is named **CI**. Its steps run on one runner and check:
 
-- Go formatting, vet, tests and build, using the version in `yonux/cli/go.mod`.
+- Go formatting, vet, tests and build for `yonux/cli` and `yonux/shell/ipc`.
 - Pull request destination.
 - Nix flake evaluation.
 - ShellCheck for shell scripts.

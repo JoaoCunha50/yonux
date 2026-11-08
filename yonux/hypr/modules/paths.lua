@@ -8,5 +8,5 @@ return {
     settings = config .. "/yonux/hyprland.lua",
     keybindings = config .. "/yonux/keybindings.lua",
     keybindings_catalog = config .. "/yonux/keybindings-catalog.json",
-    qs = "QML_IMPORT_PATH=\"" .. config .. "/quickshell\" QT_QPA_PLATFORMTHEME=xdgdesktopportal qs -c yonux",
+    qs = "PATH=\"" .. home .. "/.local/bin:$PATH\" QML_IMPORT_PATH=\"" .. config .. "/quickshell\" QT_QPA_PLATFORMTHEME=xdgdesktopportal qs -c yonux",
 }

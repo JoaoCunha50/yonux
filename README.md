@@ -153,7 +153,10 @@ cd yonux-shell
 
 The installer links `yonux/hypr/` to `~/.config/hypr` and `yonux/shell/quickshell/` to
 `~/.config/quickshell/yonux`. Existing directories or files are moved to
-`*.bak-<timestamp>`; existing symlinks are replaced. Keep the checkout in place.
+`*.bak-<timestamp>`; existing symlinks are replaced. It then builds the `yonux`
+CLI and the `yonux-ipc` helper into `~/.local/bin` (requires Go) and runs
+`yonux materialize`, which links each file of `yonux/shell/matugen/` into
+`~/.config/yonux/matugen/`. Keep the checkout in place.
 The installer supplies the user configuration; packages and services must be
 provided by either the NixOS module or the manual steps above.
 
@@ -236,8 +239,9 @@ by Git and loaded last, after generated settings.
 
 ### Colours
 
-[Colors.qml](yonux/shell/quickshell/theme/Colors.qml) runs Matugen when the wallpaper or palette
-settings change, using [config.toml](yonux/shell/quickshell/matugen/config.toml).
+[Colors.qml](yonux/shell/quickshell/theme/Colors.qml) calls `yonux-ipc theme` when the wallpaper
+or palette settings change, which runs Matugen with `~/.config/yonux/matugen/config.toml`, laid there from
+[yonux/shell/matugen/](yonux/shell/matugen/config.toml) by `yonux materialize`.
 
 To change a template or the config, put your version at the same path under
 `~/.config/yonux/user_preferences/matugen/` (for example

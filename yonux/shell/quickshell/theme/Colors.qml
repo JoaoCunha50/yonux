@@ -8,7 +8,6 @@ import yonux.services
 Singleton {
     id: root
 
-    readonly property string configPath: Quickshell.shellPath("matugen/config.toml")
     readonly property string wallpaperPath: Wallpaper.path
 
     readonly property string scheme: ShellSettings.value("theme.scheme")
@@ -47,7 +46,7 @@ Singleton {
             return;
         }
 
-        matugenProc.command = ["matugen", "image", root.wallpaperPath, "-c", root.configPath, "-j", "hex", "--prefer", "darkness", "-m", "dark", "-t", root.scheme];
+        matugenProc.command = ["yonux-ipc", "theme", root.wallpaperPath, root.scheme];
         matugenProc.running = true;
     }
 

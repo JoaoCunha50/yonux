@@ -33,14 +33,21 @@ jobs:
           [[ "$HEAD_BRANCH" == development || "$HEAD_BRANCH" == release/* ]]
       - uses: actions/setup-go@v7
         with:
-          go-version-file: yonux/cli/go.mod
-      - name: Check Go
+          go-version-file: yonux/shell/ipc/go.mod
+      - name: Check Go (cli)
         working-directory: yonux/cli
         run: |
           test -z "$(gofmt -l .)"
           go vet ./...
           go test ./...
-          go build -o "$RUNNER_TEMP/yonux" .
+          go build -o "$RUNNER_TEMP/yonux" ./cmd
+      - name: Check Go (ipc)
+        working-directory: yonux/shell/ipc
+        run: |
+          test -z "$(gofmt -l .)"
+          go vet ./...
+          go test ./...
+          go build -o "$RUNNER_TEMP/yonux-ipc" ./cmd
       - uses: cachix/install-nix-action@v31
       - name: Evaluate flake
         run: nix flake check --no-build --no-write-lock-file

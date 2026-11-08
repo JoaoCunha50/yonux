@@ -8,5 +8,6 @@ pkgs.mkShell {
 
   packages = [
     pkgs.kdePackages.qtdeclarative
+    pkgs.go
   ];
 }
