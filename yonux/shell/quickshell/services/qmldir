@@ -1,5 +1,6 @@
 module qs.services
 singleton Alerts 1.0 Alerts.qml
+singleton AppImages 1.0 AppImages.qml
 singleton Audio 1.0 Audio.qml
 singleton GameMode 1.0 GameMode.qml
 singleton Network 1.0 Network.qml

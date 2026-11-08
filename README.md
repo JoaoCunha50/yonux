@@ -11,7 +11,7 @@ A Quickshell desktop shell and Hyprland configuration, with Material styling and
 ## Components
 
 - **Bar:** workspaces, system tray, clock, CPU, memory, disk, temperature, battery, network and audio.
-- **Launcher:** search and launch desktop applications.
+- **Launcher:** search and launch desktop applications and the AppImages in `~/Applications`.
 - **Control center:** audio controls, notifications and desktop toggles.
 - **Notifications:** pop-up notifications and notification history.
 - **Wallpaper and colours:** wallpaper background and Matugen palettes for the shell and other applications.
@@ -99,6 +99,7 @@ Dependencies:
 - [`hyprpolkitagent`](https://github.com/hyprwm/hyprpolkitagent)
 - [`hyprlock`](https://github.com/hyprwm/hyprlock)
 - [`hypridle`](https://github.com/hyprwm/hypridle)
+- [`squashfs-tools`](https://github.com/plougher/squashfs-tools) (AppImages in the launcher)
 - [`nautilus`](https://gitlab.gnome.org/GNOME/nautilus)
 - [`gvfs`](https://gitlab.gnome.org/GNOME/gvfs)
 - [`udisks2`](https://github.com/storaged-project/udisks)
@@ -182,6 +183,17 @@ Set or query the wallpaper through IPC:
 qs -c yonux ipc call wallpaper set /absolute/path/to/image.png
 qs -c yonux ipc call wallpaper get
 ```
+
+### AppImages
+
+Put AppImages in `~/Applications`; they don't have to be executable. When the
+shell starts and each time the launcher opens, `yonux-ipc appimages` reads each
+AppImage's embedded desktop file and icon with `unsquashfs`. It writes
+`yonux-appimage-<id>.desktop` to `~/.local/share/applications` and the icon to
+`~/.local/share/yonux/appimages/`, so the launcher and the shortcut editor list
+the app under its own name and icon. Removing the AppImage removes both files on
+the next sync. Entries launch through `appimage-run` when it is installed (as on
+NixOS); otherwise they run the file directly, which must then be executable.
 
 ### Keybindings
 

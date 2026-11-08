@@ -30,6 +30,7 @@
       matugen
       lm_sensors
       xdg-terminal-exec
+      squashfsTools # unsquashfs: yonux-ipc reads AppImage names and icons for the launcher
     ];
 
     fonts.packages = [

@@ -6,12 +6,16 @@ import Quickshell
 import qs.theme
 import qs.components
 import qs.config
+import qs.services
 
 Overlay {
     id: root
     name: "launcher"
 
+    Component.onCompleted: AppImages.sync()
+
     onOpened: {
+        AppImages.sync();
         navigation.reset();
         searchField.forceActiveFocus();
     }
