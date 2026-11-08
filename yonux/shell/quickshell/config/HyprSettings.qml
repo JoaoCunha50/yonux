@@ -354,6 +354,19 @@ SettingsStore {
             node[parts[parts.length - 1]] = values[key];
         }
 
+        if (value("general.layout") === "scrolling") {
+            let inner = value("general.gaps_in");
+            let outer = value("general.gaps_out");
+            let horizontalOuter = Math.max(0, outer - inner);
+
+            tree.general.gaps_out = {
+                top: outer,
+                right: horizontalOuter,
+                bottom: outer,
+                left: horizontalOuter
+            };
+        }
+
         let literal = (value, indent) => {
             if (typeof value === "string")
                 return JSON.stringify(value);
