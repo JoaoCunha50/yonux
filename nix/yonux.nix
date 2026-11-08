@@ -29,9 +29,14 @@
       glib
       matugen
       lm_sensors
-      xdg-terminal-exec
       squashfsTools # unsquashfs: yonux-ipc reads AppImage names and icons for the launcher
     ];
+
+    # Terminal for desktop entries and shortcuts with "Open in a terminal";
+    xdg.terminal-exec = {
+      enable = true;
+      settings.default = [ "com.mitchellh.ghostty.desktop" "kitty.desktop" ];
+    };
 
     fonts.packages = [
       pkgs.nerd-fonts.jetbrains-mono

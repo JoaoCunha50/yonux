@@ -167,7 +167,10 @@ provided by either the NixOS module or the manual steps above.
 
 The default application bindings expect Ghostty, Zen Browser via Flatpak,
 Nautilus, Vesktop and Spotify. Nautilus is provided by the module; install the
-other applications yourself or change their bindings.
+other applications yourself or change their bindings. The module also makes
+Ghostty the terminal `xdg-terminal-exec` uses for terminal applications and
+shortcuts; on other systems list `com.mitchellh.ghostty.desktop` in
+`~/.config/xdg-terminals.list`.
 
 ## Usage
 
