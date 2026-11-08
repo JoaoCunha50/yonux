@@ -36,7 +36,7 @@ ColumnLayout {
         {
             name: "Ryoku",
             role: "inspiration",
-            url: ""
+            url: "https://ryoku.dev/"
         },
         {
             name: "caelestia",
